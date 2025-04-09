@@ -3,44 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Directory Prototype</title>
+    <title>Cuisine List</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-        .list { list-style: none; padding: 0; }
-        .list li { padding: 10px; background: #f4f4f4; margin: 5px 0; cursor: pointer; }
-        .list li:hover { background: #ddd; }
-        @media (max-width: 600px) { .list li { font-size: 14px; padding: 8px; } }
+        /* Basic styling for the layout */
+        .cuisine {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .cuisine img {
+            width: 100px; /* Adjust the size as needed */
+            height: auto;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>Cuisine Types</h1>
-    <ul id="cuisine-list" class="list"></ul>
+    <h1>Cuisine List</h1>
+    <div id="cuisine-container"></div>
 
     <script>
-        const cuisineUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSnHOqrshe73kAA0Sju9du36ApJckFMzeZhypLXmsCd2klE9PTK0SGC3-3COWAQ5oomjWYNLgiGi4ai/pub?gid=887292516&single=true&output=csv";
+        // URL of your published CSV file
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSnHOqrshe73kAA0Sju9du36ApJckFMzeZhypLXmsCd2klE9PTK0SGC3-3COWAQ5oomjWYNLgiGi4ai/pub?gid=887292516&single=true&output=csv';
 
-        async function fetchCSV(url) {
-            const response = await fetch(url);
-            const text = await response.text();
-            return text.split("\n").map(row => row.split(","));
+        // Function to fetch and parse the CSV file
+        async function fetchCSV() {
+            const response = await fetch(csvUrl);
+            const data = await response.text();
+            return parseCSV(data);
         }
 
-        async function loadCuisines() {
-            const data = await fetchCSV(cuisineUrl);
-            const list = document.getElementById("cuisine-list");
-            list.innerHTML = ""; // Clear existing list
-            for (let i = 1; i < data.length; i++) { // Skip header
-                const cuisineId = data[i][0];
-                const cuisineName = data[i][1];
-                const li = document.createElement("li");
-                li.textContent = cuisineName;
-                li.onclick = () => window.location.href = `restaurants.html?cuisine=${cuisineId}`;
-                list.appendChild(li);
-            }
+        // Function to parse CSV data
+        function parseCSV(data) {
+            const rows = data.split('\n').map(row => row.split(','));
+            return rows.slice(1); // Skip the header row
         }
 
-        loadCuisines();
-        setInterval(loadCuisines, 60000); // Refresh every 60 seconds
+        // Function to display the cuisines
+        function displayCuisines(cuisines) {
+            const container = document.getElementById('cuisine-container');
+            cuisines.forEach(cuisine => {
+                const cuisineId = cuisine[0]; // First column: Cuisine ID
+                const imageUrl = cuisine[1]; // Second column: Cuisine Image URL
+
+                const cuisineDiv = document.createElement('div');
+                cuisineDiv.className = 'cuisine';
+
+                const idDiv = document.createElement('div');
+                idDiv.className = 'cuisine-id';
+                idDiv.textContent = cuisineId;
+
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = cuisineId;
+
+                cuisineDiv.appendChild(idDiv);
+                cuisineDiv.appendChild(img);
+                container.appendChild(cuisineDiv);
+            });
+        }
+
+        // Fetch and display the CSV data
+        fetchCSV().then(cuisines => displayCuisines(cuisines)).catch(error => {
+            console.error('Error fetching or parsing CSV:', error);
+        });
     </script>
 </body>
 </html>
