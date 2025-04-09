@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurants</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .tile { text-align: center; cursor: pointer; }
+        .tile img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; }
+        .tile .name { font-size: 18px; margin: 10px 0 5px; }
+        .tile .keywords { font-size: 14px; color: #666; }
+        .back { margin-bottom: 20px; }
+        @media (max-width: 600px) { .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back">Back to Cuisines</a>
+    <h1>Restaurants</h1>
+    <div id="restaurant-grid" class="grid"></div>
+
+    <script>
+        const restaurantUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSnHOqrshe73kAA0Sju9du36ApJckFMzeZhypLXmsCd2klE9PTK0SGC3-3COWAQ5oomjWYNLgiGi4ai/pub?gid=499357101&single=true&output=csv";
+        const urlParams = new URLSearchParams(window.location.search);
+        const cuisineId = urlParams.get("cuisine");
+
+        async function fetchCSV(url) {
+            const response = await fetch(url);
+            const text = await response.text();
+            return text.split("\n").map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)); // Handles commas in quotes
+        }
+
+        async function loadRestaurants() {
+            const data = await fetchCSV(restaurantUrl);
+            const grid = document.getElementById("restaurant-grid");
+            grid.innerHTML = "";
+            for (let i = 1; i < data.length; i++) { // Skip header
+                const row = data[i];
+                const operational = row[10]?.trim().toLowerCase() === "yes"; // Col K: Operational (Y/N)
+                if (!operational) continue;
+
+                const restaurantId = row[1]; // Col B
+                const name = row[2]; // Col C
+                const keywords = row[3]?.split(", ") || []; // Col D
+                const profilePic = row[9]; // Col J
+
+                if (keywords.includes(cuisineId)) {
+                    const tile = document.createElement("div");
+                    tile.className = "tile";
+                    tile.innerHTML = `
+                        <img src="${profilePic}" alt="${name}">
+                        <div class="name">${name}</div>
+                        <div class="keywords">${keywords.join(", ")}</div>
+                    `;
+                    tile.onclick = () => window.location.href = `profile.html?restaurant=${restaurantId}`;
+                    grid.appendChild(tile);
+                }
+            }
+        }
+
+        loadRestaurants();
+    </script>
+</body>
+</html>
