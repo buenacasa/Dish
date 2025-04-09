@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Map</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        #map { height: 500px; width: 100%; }
+        #filters { margin-bottom: 20px; }
+        #filters select, #filters input { margin-right: 10px; }
+        .back { margin-bottom: 20px; }
+        @media (max-width: 600px) { #map { height: 300px; } }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="back">Back to Cuisines</a>
+    <div id="filters">
+        <select id="cuisine-filter"><option value="">All Cuisines</option></select>
+        <select id="city-filter"><option value="">All Cities</option></select>
+        <select id="neighborhood-filter"><option value="">All Neighborhoods</option></select>
+        <select id="chain-filter">
+            <option value="">All Chains</option>
+            <option value="Y">Yes</option>
+            <option value="N">No</option>
+        </select>
+        <input type="checkbox" id="operational-filter" checked> Operational Only
+    </div>
+    <div id="map"></div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
+    <script>
+        const restaurantUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSnHOqrshe73kAA0Sju9du36ApJckFMzeZhypLXmsCd2klE9PTK0SGC3-3COWAQ5oomjWYNLgiGi4ai/pub?gid=499357101&single=true&output=csv";
+        let map, restaurants = [];
+
+        async function fetchCSV(url) {
+            const response = await fetch(url);
+            const text = await response.text();
+            return text.split("\n").map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
+        }
+
+        async function initMap() {
+            const data = await fetchCSV(restaurantUrl);
+            const cuisineSet = new Set(), citySet = new Set(), neighborhoodSet = new Set();
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 37.7749, lng: -122.4194 }, // Default: San Francisco
+                zoom: 10
+            });
+
+            for (let i = 1; i < data.length; i++) {
+                const row = data[i];
+                const operational = row[10]?.trim().toLowerCase() === "y";
+                const restaurant = {
+                    id: row[1], name: row[2], keywords: row[3]?.split(", ") || [],
+                    chain: row[4], address: row[5], city: row[6], neighborhood: row[7],
+                    mapsLink: row[8], operational
+                };
+
+                if (operational) {
+                    restaurant.keywords.forEach(k => cuisineSet.add(k));
+                    citySet.add(restaurant.city);
+                    neighborhoodSet.add(restaurant.neighborhood);
+                    restaurants.push(restaurant);
+                }
+            }
+
+            populateFilters(cuisineSet, citySet, neighborhoodSet);
+            updateMap();
+
+            document.getElementById("cuisine-filter").onchange = updateMap;
+            document.getElementById("city-filter").onchange = updateMap;
+            document.getElementById("neighborhood-filter").onchange = updateMap;
+            document.getElementById("chain-filter").onchange = updateMap;
+            document.getElementById("operational-filter").onchange = updateMap;
+        }
+
+        function populateFilters(cuisineSet, citySet, neighborhoodSet) {
+            const cuisineSelect = document.getElementById("cuisine-filter");
+            const citySelect = document.getElementById("city-filter");
+            const neighborhoodSelect = document.getElementById("neighborhood-filter");
+
+            cuisineSet.forEach(c => cuisineSelect.add(new Option(c, c)));
+            citySet.forEach(c => citySelect.add(new Option(c, c)));
+            neighborhoodSet.forEach(n => neighborhoodSelect.add(new Option(n, n)));
+        }
+
+        function updateMap() {
+            const cuisine = document.getElementById("cuisine-filter").value;
+            const city = document.getElementById("city-filter").value;
+            const neighborhood = document.getElementById("neighborhood-filter").value;
+            const chain = document.getElementById("chain-filter").value;
+            const operationalOnly = document.getElementById("operational-filter").checked;
+
+            restaurants.forEach(r => {
+                if (r.marker) r.marker.setMap(null);
+            });
+
+            restaurants.filter(r => {
+                return (!cuisine || r.keywords.includes(cuisine)) &&
+                       (!city || r.city === city) &&
+                       (!neighborhood || r.neighborhood === neighborhood) &&
+                       (!chain || r.chain === chain) &&
+                       (!operationalOnly || r.operational);
+            }).forEach(r => {
+                fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(r.address + ", " + r.city)}&key=YOUR_GOOGLE_MAPS_API_KEY`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.results[0]) {
+                            const pos = data.results[0].geometry.location;
+                            r.marker = new google.maps.Marker({
+                                position: pos,
+                                map: map,
+                                title: r.name
+                            });
+                            r.marker.addListener("click", () => {
+                                window.location.href = `profile.html?restaurant=${r.id}`;
+                            });
+                        }
+                    });
+            });
+        }
+
+        initMap();
+    </script>
+</body>
+</html>
