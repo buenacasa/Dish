@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Directory Prototype</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .list { list-style: none; padding: 0; }
+        .list li { padding: 10px; background: #f4f4f4; margin: 5px 0; cursor: pointer; }
+        .list li:hover { background: #ddd; }
+        @media (max-width: 600px) { .list li { font-size: 14px; padding: 8px; } }
+    </style>
+</head>
+<body>
+    <h1>Cuisine Types</h1>
+    <ul id="cuisine-list" class="list"></ul>
+
+    <script>
+        const cuisineUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSnHOqrshe73kAA0Sju9du36ApJckFMzeZhypLXmsCd2klE9PTK0SGC3-3COWAQ5oomjWYNLgiGi4ai/pub?gid=887292516&single=true&output=csv";
+
+        async function fetchCSV(url) {
+            const response = await fetch(url);
+            const text = await response.text();
+            return text.split("\n").map(row => row.split(","));
+        }
+
+        async function loadCuisines() {
+            const data = await fetchCSV(cuisineUrl);
+            const list = document.getElementById("cuisine-list");
+            list.innerHTML = ""; // Clear existing list
+            for (let i = 1; i < data.length; i++) { // Skip header
+                const cuisineId = data[i][0];
+                const cuisineName = data[i][1];
+                const li = document.createElement("li");
+                li.textContent = cuisineName;
+                li.onclick = () => window.location.href = `restaurants.html?cuisine=${cuisineId}`;
+                list.appendChild(li);
+            }
+        }
+
+        loadCuisines();
+        setInterval(loadCuisines, 60000); // Refresh every 60 seconds
+    </script>
+</body>
+</html>
