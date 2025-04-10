@@ -25,14 +25,14 @@
     <script>
         const restaurantUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSnHOqrshe73kAA0Sju9du36ApJckFMzeZhypLXmsCd2klE9PTK0SGC3-3COWAQ5oomjWYNLgiGi4ai/pub?gid=499357101&single=true&output=csv";
         const urlParams = new URLSearchParams(window.location.search);
-        const cuisineId = urlParams.get("cuisine");
+        const cuisineId = urlParams.get("cuisine")?.trim(); // Trim the cuisineId
 
         async function fetchCSV(url) {
             try {
                 const response = await fetch(url);
                 if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                 const text = await response.text();
-                console.log("Raw CSV data:", text); // Debug: Log raw data
+                console.log("Raw CSV data:", text);
                 return text.split("\n").map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
             } catch (error) {
                 document.getElementById("error").textContent = `Failed to fetch CSV: ${error.message}`;
@@ -50,13 +50,12 @@
 
             const grid = document.getElementById("restaurant-grid");
             grid.innerHTML = "";
-            console.log("Parsed CSV data:", data); // Debug: Log parsed data
+            console.log("Parsed CSV data:", data);
 
             for (let i = 1; i < data.length; i++) {
                 const row = data[i];
-                console.log(`Row ${i}:`, row); // Debug: Log each row
+                console.log(`Row ${i}:`, row);
 
-                // Check if row has enough columns
                 if (row.length < 11) {
                     console.warn(`Row ${i} has insufficient columns:`, row);
                     continue;
@@ -67,10 +66,11 @@
 
                 const restaurantId = row[1];
                 const name = row[2];
-                const keywords = row[3]?.split(", ") || [];
+                // Clean up keywords: remove quotes and trim spaces
+                const keywords = row[3]?.replace(/"/g, "").split(", ").map(k => k.trim()) || [];
                 const profilePic = row[9];
 
-                console.log(`Cuisine ID: ${cuisineId}, Keywords: ${keywords}`); // Debug: Log comparison
+                console.log(`Cuisine ID: ${cuisineId}, Keywords: ${keywords}`);
 
                 if (keywords.includes(cuisineId)) {
                     const tile = document.createElement("div");
