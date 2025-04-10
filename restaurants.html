@@ -25,7 +25,7 @@
     <script>
         const restaurantUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSnHOqrshe73kAA0Sju9du36ApJckFMzeZhypLXmsCd2klE9PTK0SGC3-3COWAQ5oomjWYNLgiGi4ai/pub?gid=499357101&single=true&output=csv";
         const urlParams = new URLSearchParams(window.location.search);
-        const cuisineId = urlParams.get("cuisine")?.trim(); // Trim the cuisineId
+        const cuisineId = urlParams.get("cuisine")?.trim().toLowerCase(); // Normalize cuisineId
 
         async function fetchCSV(url) {
             try {
@@ -66,11 +66,12 @@
 
                 const restaurantId = row[1];
                 const name = row[2];
-                // Clean up keywords: remove quotes and trim spaces
-                const keywords = row[3]?.replace(/"/g, "").split(", ").map(k => k.trim()) || [];
+                // Clean up keywords: remove quotes, trim spaces, and normalize case
+                const rawKeywords = row[3] || "";
+                const keywords = rawKeywords.replace(/"/g, "").split(",").map(k => k.trim().toLowerCase());
                 const profilePic = row[9];
 
-                console.log(`Cuisine ID: ${cuisineId}, Keywords: ${keywords}`);
+                console.log(`Cuisine ID: "${cuisineId}", Keywords:`, keywords);
 
                 if (keywords.includes(cuisineId)) {
                     const tile = document.createElement("div");
