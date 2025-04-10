@@ -11,7 +11,9 @@ function loadCSV(file, callback) {
         .then(data => {
             console.log(`Raw data from ${file}:`, data.substring(0, 100));
             Papa.parse(data, { 
-                header: true, 
+                header: true,
+                skipEmptyLines: true, // Skip empty lines
+                dynamicTyping: false, // Treat all values as strings
                 complete: result => {
                     console.log(`Parsed ${file}:`, result.data);
                     callback(result);
@@ -111,7 +113,7 @@ if (document.getElementById('map')) {
 
     // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
     loadCSV('Restaurant.csv', function(result) {
