@@ -62,18 +62,20 @@
                 }
 
                 const operational = row[10]?.trim().toLowerCase() === "y";
+                console.log(`Row ${i} Operational: ${operational}`);
+
                 if (!operational) continue;
 
                 const restaurantId = row[1];
                 const name = row[2];
                 const rawKeywords = row[3] || "";
-                const keywords = rawKeywords.replace(/"/g, "").toLowerCase();
+                const keywords = rawKeywords.replace(/"/g, "").toLowerCase().trim();
                 const profilePic = row[9];
 
                 console.log(`Cuisine ID: "${cuisineId}", Keywords: "${keywords}"`);
 
-                // Check if cuisineId is a substring of keywords
                 if (keywords.includes(cuisineId)) {
+                    console.log(`Match found for ${name}`);
                     const tile = document.createElement("div");
                     tile.className = "tile";
                     tile.innerHTML = `
