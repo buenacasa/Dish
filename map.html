@@ -11,6 +11,7 @@
         #filters { margin-bottom: 20px; }
         #filters select, #filters input { margin-right: 10px; }
         .back { margin-bottom: 20px; }
+        .error { color: red; font-weight: bold; }
         @media (max-width: 600px) { #map { height: 300px; } }
     </style>
 </head>
@@ -27,6 +28,7 @@
         </select>
         <input type="checkbox" id="operational-filter" checked> Operational Only
     </div>
+    <div id="error" class="error"></div>
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -35,13 +37,26 @@
         let map, restaurants = [];
 
         async function fetchCSV(url) {
-            const response = await fetch(url);
-            const text = await response.text();
-            return text.split("\n").map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                const text = await response.text();
+                console.log("Raw CSV data:", text);
+                return text.split("\n").map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
+            } catch (error) {
+                document.getElementById("error").textContent = `Failed to fetch CSV: ${error.message}`;
+                console.error("Fetch error:", error);
+                return [];
+            }
         }
 
         async function initMap() {
             const data = await fetchCSV(restaurantUrl);
+            if (!data.length) {
+                document.getElementById("error").textContent = "No data received from CSV.";
+                return;
+            }
+
             const cuisineSet = new Set(), citySet = new Set(), neighborhoodSet = new Set();
 
             map = L.map('map').setView([29.4241, -98.4936], 10);
@@ -51,16 +66,33 @@
 
             for (let i = 1; i < data.length; i++) {
                 const row = data[i];
+                console.log(`Row ${i}:`, row);
+
+                if (row.length < 12) {
+                    console.warn(`Row ${i} has insufficient columns:`, row);
+                    continue;
+                }
+
                 const operational = row[10]?.trim().toLowerCase() === "y";
                 const coords = row[11]?.split(",");
+                console.log(`Row ${i} Coordinates:`, coords);
+
                 if (operational && coords && coords.length === 2) {
+                    const lat = parseFloat(coords[0]);
+                    const lng = parseFloat(coords[1]);
+                    if (isNaN(lat) || isNaN(lng)) {
+                        console.warn(`Row ${i} has invalid coordinates:`, coords);
+                        continue;
+                    }
+
                     const restaurant = {
-                        id: row[1], name: row[2], keywords: row[3]?.split(", ") || [],
+                        id: row[1], name: row[2], keywords: row[3]?.replace(/"/g, "").split(", ").map(k => k.trim()) || [],
                         chain: row[4], city: row[6], neighborhood: row[7], operational
                     };
-                    restaurant.marker = L.marker([parseFloat(coords[0]), parseFloat(coords[1])])
+                    restaurant.marker = L.marker([lat, lng])
                         .addTo(map)
                         .bindPopup(`<a href="profile.html?restaurant=${restaurant.id}">${restaurant.name}</a>`);
+                    console.log(`Added marker for ${restaurant.name} at [${lat}, ${lng}]`);
                     restaurants.push(restaurant);
 
                     restaurant.keywords.forEach(k => cuisineSet.add(k));
@@ -71,6 +103,10 @@
 
             populateFilters(cuisineSet, citySet, neighborhoodSet);
             updateMap();
+
+            if (!restaurants.length) {
+                document.getElementById("error").textContent = "No restaurants with valid coordinates found.";
+            }
 
             document.getElementById("cuisine-filter").onchange = updateMap;
             document.getElementById("city-filter").onchange = updateMap;
