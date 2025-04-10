@@ -1,16 +1,38 @@
-// Load CSV files using PapaParse (include PapaParse library in your project)
+// Load CSV files using PapaParse
 function loadCSV(file, callback) {
-    fetch(`data/${file}`)
-        .then(response => response.text())
-        .then(data => Papa.parse(data, { header: true, complete: callback }))
+    const url = `data/${file}`;
+    console.log(`Fetching: ${url}`); // Debug: Log the exact URL
+    fetch(url)
+        .then(response => {
+            console.log(`Response status for ${url}: ${response.status}`); // Debug: Log status
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.text();
+        })
+        .then(data => {
+            console.log(`Raw data from ${file}:`, data.substring(0, 100)); // Debug: First 100 chars
+            Papa.parse(data, { 
+                header: true, 
+                complete: result => {
+                    console.log(`Parsed ${file}:`, result.data); // Debug: Parsed data
+                    callback(result);
+                }
+            });
+        })
         .catch(error => console.error(`Error loading ${file}:`, error));
 }
 
 // Home Page - Load Cuisines
 if (document.getElementById('cuisine-grid')) {
+    console.log("Cuisine grid element found, loading cuisines...");
     loadCSV('Cuisine.csv', function(result) {
         const grid = document.getElementById('cuisine-grid');
+        if (!result.data || result.data.length === 0) {
+            console.error("No data found in Cuisine.csv or parsing failed.");
+            grid.innerHTML = "<p>Error: Could not load cuisines.</p>";
+            return;
+        }
         result.data.forEach(cuisine => {
+            console.log("Adding tile for:", cuisine['Cuisine ID']);
             const tile = document.createElement('div');
             tile.className = 'tile';
             tile.innerHTML = `<img src="${cuisine['Cuisine Image']}" alt="${cuisine['Cuisine ID']}"><p>${cuisine['Cuisine ID']}</p>`;
