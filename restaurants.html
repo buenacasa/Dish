@@ -25,7 +25,13 @@
     <script>
         const restaurantUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSnHOqrshe73kAA0Sju9du36ApJckFMzeZhypLXmsCd2klE9PTK0SGC3-3COWAQ5oomjWYNLgiGi4ai/pub?gid=499357101&single=true&output=csv";
         const urlParams = new URLSearchParams(window.location.search);
-        const cuisineId = urlParams.get("cuisine")?.toLowerCase();
+        const cuisineId = urlParams.get("cuisine")?.trim(); // Keep capitalization
+
+        // Function to log character codes for debugging
+        function logCharCodes(str, label) {
+            const codes = str.split("").map(char => char.charCodeAt(0));
+            console.log(`${label} char codes:`, codes);
+        }
 
         async function fetchCSV(url) {
             try {
@@ -69,10 +75,12 @@
                 const restaurantId = row[1];
                 const name = row[2];
                 const rawKeywords = row[3] || "";
-                const keywords = rawKeywords.replace(/"/g, "").toLowerCase().trim();
+                const keywords = rawKeywords.replace(/"/g, "").trim(); // Keep capitalization
                 const profilePic = row[9];
 
                 console.log(`Cuisine ID: "${cuisineId}", Keywords: "${keywords}"`);
+                logCharCodes(cuisineId, `Cuisine ID (${name})`);
+                logCharCodes(keywords, `Keywords (${name})`);
 
                 if (keywords.includes(cuisineId)) {
                     console.log(`Match found for ${name}`);
