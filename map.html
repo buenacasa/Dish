@@ -3,34 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Map</title>
+    <title>Restaurant Map - The Dish</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-        #map { height: 500px; width: 100%; }
-        #filters { margin-bottom: 20px; }
-        #filters select, #filters input { margin-right: 10px; }
-        .back { margin-bottom: 20px; }
+        body {
+            background: linear-gradient(to bottom, #fef9e7, #f7e8c3);
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #map { height: 500px; width: 100%; border-radius: 8px; }
+        nav { background: #8b5e3c; padding: 1rem; }
+        nav a { color: white; font-weight: bold; }
         @media (max-width: 600px) { #map { height: 300px; } }
     </style>
 </head>
 <body>
-    <a href="index.html" class="back">Back to Cuisines</a>
-    <div id="filters">
-        <select id="cuisine-filter"><option value="">All Cuisines</option></select>
-        <select id="city-filter"><option value="">All Cities</option></select>
-        <select id="neighborhood-filter"><option value="">All Neighborhoods</option></select>
-        <select id="chain-filter">
-            <option value="">All Chains</option>
-            <option value="Y">Yes</option>
-            <option value="N">No</option>
-        </select>
-        <input type="checkbox" id="operational-filter" checked> Operational Only
+    <nav class="text-center">
+        <a href="index.html" class="mx-4">Cuisines</a>
+        <a href="map.html" class="mx-4">Map</a>
+    </nav>
+    <div class="container mx-auto p-6">
+        <h1 class="text-2xl font-bold text-center mb-4 text-gray-800">Restaurant Map</h1>
+        <div id="filters" class="mb-6 flex flex-wrap gap-4 justify-center">
+            <select id="cuisine-filter" class="p-2 border rounded"><option value="">All Cuisines</option></select>
+            <select id="city-filter" class="p-2 border rounded"><option value="">All Cities</option></select>
+            <select id="neighborhood-filter" class="p-2 border rounded"><option value="">All Neighborhoods</option></select>
+            <select id="chain-filter" class="p-2 border rounded">
+                <option value="">All Chains</option>
+                <option value="Y">Yes</option>
+                <option value="N">No</option>
+            </select>
+            <label class="flex items-center">
+                <input type="checkbox" id="operational-filter" checked class="mr-2"> Operational Only
+            </label>
+        </div>
+        <div id="map"></div>
     </div>
-    <div id="map"></div>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        const restaurantUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSnHOqrshe73kAA0Sju9du36ApJckFMzeZhypLXmsCd2klE9PTK0SGC3-3COWAQ5oomjWYNLgiGi4ai/pub?gid=499357101&single=true&output=csv";
+        const restaurantUrl = "YOUR_RESTAURANT_CSV_URL";
         let map, restaurants = [];
 
         async function fetchCSV(url) {
@@ -39,29 +53,42 @@
             return text.split("\n").map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
         }
 
+        async function geocodeAddress(address) {
+            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`;
+            const response = await fetch(url, { headers: { 'User-Agent': 'TheDish/1.0' } });
+            const data = await response.json();
+            return data[0] ? { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) } : null;
+        }
+
         async function initMap() {
             const data = await fetchCSV(restaurantUrl);
             const cuisineSet = new Set(), citySet = new Set(), neighborhoodSet = new Set();
 
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: 37.7749, lng: -122.4194 }, // Default: San Francisco
-                zoom: 10
-            });
+            map = L.map('map').setView([29.4241, -98.4936], 10); // San Antonio
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
 
             for (let i = 1; i < data.length; i++) {
                 const row = data[i];
                 const operational = row[10]?.trim().toLowerCase() === "y";
                 const restaurant = {
                     id: row[1], name: row[2], keywords: row[3]?.split(", ") || [],
-                    chain: row[4], address: row[5], city: row[6], neighborhood: row[7],
-                    mapsLink: row[8], operational
+                    chain: row[4], address: row[5]?.replace(/"/g, ""), city: row[6],
+                    neighborhood: row[7], operational
                 };
 
                 if (operational) {
                     restaurant.keywords.forEach(k => cuisineSet.add(k));
                     citySet.add(restaurant.city);
                     neighborhoodSet.add(restaurant.neighborhood);
-                    restaurants.push(restaurant);
+                    const coords = await geocodeAddress(`${restaurant.address}, ${restaurant.city}`);
+                    if (coords) {
+                        restaurant.marker = L.marker([coords.lat, coords.lng])
+                            .addTo(map)
+                            .bindPopup(`<a href="profile.html?restaurant=${restaurant.id}">${restaurant.name}</a>`);
+                        restaurants.push(restaurant);
+                    }
                 }
             }
 
@@ -92,33 +119,14 @@
             const chain = document.getElementById("chain-filter").value;
             const operationalOnly = document.getElementById("operational-filter").checked;
 
-            restaurants.forEach(r => {
-                if (r.marker) r.marker.setMap(null);
-            });
-
+            restaurants.forEach(r => r.marker.remove());
             restaurants.filter(r => {
                 return (!cuisine || r.keywords.includes(cuisine)) &&
                        (!city || r.city === city) &&
                        (!neighborhood || r.neighborhood === neighborhood) &&
                        (!chain || r.chain === chain) &&
                        (!operationalOnly || r.operational);
-            }).forEach(r => {
-                fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(r.address + ", " + r.city)}&key=YOUR_GOOGLE_MAPS_API_KEY`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.results[0]) {
-                            const pos = data.results[0].geometry.location;
-                            r.marker = new google.maps.Marker({
-                                position: pos,
-                                map: map,
-                                title: r.name
-                            });
-                            r.marker.addListener("click", () => {
-                                window.location.href = `profile.html?restaurant=${r.id}`;
-                            });
-                        }
-                    });
-            });
+            }).forEach(r => r.marker.addTo(map));
         }
 
         initMap();
