@@ -81,7 +81,7 @@
 
                 const operational = row[10]?.trim().toLowerCase() === "y";
                 const rawCoords = row[11] || "";
-                const coords = rawCoords.replace(/"/g, "").split(",").map(c => c.trim());
+                const coords = rawCoords.replace(/"/g, "").replace(/\r/g, "").split(",").map(c => c.trim());
                 console.log(`Row ${i} Coordinates:`, coords);
 
                 if (operational && coords && coords.length === 2) {
@@ -96,7 +96,7 @@
                     }
 
                     const restaurant = {
-                        id: row[1], name: row[2], keywords: row[3]?.replace(/"/g, "").trim() || "", // Keep capitalization
+                        id: row[1], name: row[2], keywords: row[3]?.replace(/"/g, "").replace(/\r/g, "").trim() || "",
                         chain: row[4], city: row[6], neighborhood: row[7], operational
                     };
                     restaurant.marker = L.marker([lat, lng])
@@ -140,7 +140,7 @@
             const cuisine = document.getElementById("cuisine-filter").value;
             const city = document.getElementById("city-filter").value;
             const neighborhood = document.getElementById("neighborhood-filter").value;
-            const chain = document.getElementById("chain-filter").value;
+            const chain = document.getElement of="chain-filter").value;
             const operationalOnly = document.getElementById("operational-filter").checked;
 
             restaurants.forEach(r => r.marker.remove());
