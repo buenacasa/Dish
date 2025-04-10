@@ -3,44 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Map - The Dish</title>
+    <title>Restaurant Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body {
-            background: linear-gradient(to bottom, #fef9e7, #f7e8c3);
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        #map { height: 500px; width: 100%; border-radius: 8px; }
-        nav { background: #8b5e3c; padding: 1rem; }
-        nav a { color: white; font-weight: bold; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        #map { height: 500px; width: 100%; }
+        #filters { margin-bottom: 20px; }
+        #filters select, #filters input { margin-right: 10px; }
+        .back { margin-bottom: 20px; }
         @media (max-width: 600px) { #map { height: 300px; } }
     </style>
 </head>
 <body>
-    <nav class="text-center">
-        <a href="index.html" class="mx-4">Cuisines</a>
-        <a href="map.html" class="mx-4">Map</a>
-    </nav>
-    <div class="container mx-auto p-6">
-        <h1 class="text-2xl font-bold text-center mb-4 text-gray-800">Restaurant Map</h1>
-        <div id="filters" class="mb-6 flex flex-wrap gap-4 justify-center">
-            <select id="cuisine-filter" class="p-2 border rounded"><option value="">All Cuisines</option></select>
-            <select id="city-filter" class="p-2 border rounded"><option value="">All Cities</option></select>
-            <select id="neighborhood-filter" class="p-2 border rounded"><option value="">All Neighborhoods</option></select>
-            <select id="chain-filter" class="p-2 border rounded">
-                <option value="">All Chains</option>
-                <option value="Y">Yes</option>
-                <option value="N">No</option>
-            </select>
-            <label class="flex items-center">
-                <input type="checkbox" id="operational-filter" checked class="mr-2"> Operational Only
-            </label>
-        </div>
-        <div id="map"></div>
+    <a href="index.html" class="back">Back to Cuisines</a>
+    <div id="filters">
+        <select id="cuisine-filter"><option value="">All Cuisines</option></select>
+        <select id="city-filter"><option value="">All Cities</option></select>
+        <select id="neighborhood-filter"><option value="">All Neighborhoods</option></select>
+        <select id="chain-filter">
+            <option value="">All Chains</option>
+            <option value="Y">Yes</option>
+            <option value="N">No</option>
+        </select>
+        <input type="checkbox" id="operational-filter" checked> Operational Only
     </div>
+    <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -53,18 +40,11 @@
             return text.split("\n").map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
         }
 
-        async function geocodeAddress(address) {
-            const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`;
-            const response = await fetch(url, { headers: { 'User-Agent': 'TheDish/1.0' } });
-            const data = await response.json();
-            return data[0] ? { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) } : null;
-        }
-
         async function initMap() {
             const data = await fetchCSV(restaurantUrl);
             const cuisineSet = new Set(), citySet = new Set(), neighborhoodSet = new Set();
 
-            map = L.map('map').setView([29.4241, -98.4936], 10); // San Antonio
+            map = L.map('map').setView([29.4241, -98.4936], 10);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(map);
@@ -72,23 +52,20 @@
             for (let i = 1; i < data.length; i++) {
                 const row = data[i];
                 const operational = row[10]?.trim().toLowerCase() === "y";
-                const restaurant = {
-                    id: row[1], name: row[2], keywords: row[3]?.split(", ") || [],
-                    chain: row[4], address: row[5]?.replace(/"/g, ""), city: row[6],
-                    neighborhood: row[7], operational
-                };
+                const coords = row[11]?.split(",");
+                if (operational && coords && coords.length === 2) {
+                    const restaurant = {
+                        id: row[1], name: row[2], keywords: row[3]?.split(", ") || [],
+                        chain: row[4], city: row[6], neighborhood: row[7], operational
+                    };
+                    restaurant.marker = L.marker([parseFloat(coords[0]), parseFloat(coords[1])])
+                        .addTo(map)
+                        .bindPopup(`<a href="profile.html?restaurant=${restaurant.id}">${restaurant.name}</a>`);
+                    restaurants.push(restaurant);
 
-                if (operational) {
                     restaurant.keywords.forEach(k => cuisineSet.add(k));
                     citySet.add(restaurant.city);
                     neighborhoodSet.add(restaurant.neighborhood);
-                    const coords = await geocodeAddress(`${restaurant.address}, ${restaurant.city}`);
-                    if (coords) {
-                        restaurant.marker = L.marker([coords.lat, coords.lng])
-                            .addTo(map)
-                            .bindPopup(`<a href="profile.html?restaurant=${restaurant.id}">${restaurant.name}</a>`);
-                        restaurants.push(restaurant);
-                    }
                 }
             }
 
