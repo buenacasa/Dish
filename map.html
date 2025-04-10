@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Dish - Map</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+</head>
+<body>
+    <header>
+        <a href="index.html">Back to Home</a>
+    </header>
+    <div id="filters">
+        <select id="cuisine-filter"><option value="">All Cuisines</option></select>
+        <select id="city-filter"><option value="">All Cities</option></select>
+        <select id="neighborhood-filter"><option value="">All Neighborhoods</option></select>
+        <select id="chain-filter"><option value="">Chain (All)</option><option value="Y">Yes</option><option value="N">No</option></select>
+    </div>
+    <div id="map"></div>
+    <script src="js/script.js"></script>
+</body>
+</html>
