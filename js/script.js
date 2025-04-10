@@ -12,10 +12,13 @@ function loadCSV(file, callback) {
             console.log(`Raw data from ${file}:`, data.substring(0, 100));
             Papa.parse(data, { 
                 header: true,
-                skipEmptyLines: true, // Skip empty lines
-                dynamicTyping: false, // Treat all values as strings
+                skipEmptyLines: true,
+                dynamicTyping: false,
                 complete: result => {
                     console.log(`Parsed ${file}:`, result.data);
+                    if (result.errors.length > 0) {
+                        console.error(`Parsing errors in ${file}:`, result.errors);
+                    }
                     callback(result);
                 }
             });
@@ -52,7 +55,21 @@ if (document.getElementById('restaurant-grid')) {
 
     loadCSV('Restaurant.csv', function(result) {
         const grid = document.getElementById('restaurant-grid');
-        const filtered = result.data.filter(r => r['Operational (Y/N)'] === 'Y' && r['Cuisine Keywords'].includes(cuisine));
+        if (!result.data || result.data.length === 0) {
+            console.error("No restaurant data found or parsing failed.");
+            grid.innerHTML = "<p>Error: Could not load restaurants.</p>";
+            return;
+        }
+        const filtered = result.data.filter(r => {
+            const isOperational = r['Operational (Y/N)'] === 'Yes';
+            const hasCuisine = r['Cuisine Keywords'] && r['Cuisine Keywords'].includes(cuisine);
+            console.log(`Checking restaurant: ${r['Restaurant Name']}, Operational: ${isOperational}, Has Cuisine: ${hasCuisine}`);
+            return isOperational && hasCuisine;
+        });
+        console.log(`Filtered ${filtered.length} restaurants for cuisine: ${cuisine}`);
+        if (filtered.length === 0) {
+            grid.innerHTML = "<p>No restaurants found for this cuisine.</p>";
+        }
         filtered.forEach(restaurant => {
             const tile = document.createElement('div');
             tile.className = 'tile';
@@ -76,6 +93,11 @@ if (document.getElementById('restaurant-profile')) {
 
     loadCSV('Restaurant.csv', function(result) {
         const restaurant = result.data.find(r => r['Restaurant ID'] === id);
+        if (!restaurant) {
+            console.error(`Restaurant with ID ${id} not found.`);
+            document.getElementById('restaurant-profile').innerHTML = "<p>Restaurant not found.</p>";
+            return;
+        }
         const profile = document.getElementById('restaurant-profile');
         const keywords = restaurant['Cuisine Keywords'].split(', ').map(k => `<a href="cuisine.html?cuisine=${encodeURIComponent(k)}">${k}</a>`).join(', ');
         profile.innerHTML = `
@@ -117,7 +139,12 @@ if (document.getElementById('map')) {
     }).addTo(map);
 
     loadCSV('Restaurant.csv', function(result) {
-        const restaurants = result.data.filter(r => r['Operational (Y/N)'] === 'Y');
+        if (!result.data || result.data.length === 0) {
+            console.error("No restaurant data found for map.");
+            return;
+        }
+        const restaurants = result.data.filter(r => r['Operational (Y/N)'] === 'Yes');
+        console.log(`Found ${restaurants.length} operational restaurants for map.`);
         const cuisineFilter = document.getElementById('cuisine-filter');
         const cityFilter = document.getElementById('city-filter');
         const neighborhoodFilter = document.getElementById('neighborhood-filter');
@@ -139,14 +166,24 @@ if (document.getElementById('map')) {
             markers = [];
 
             const filtered = restaurants.filter(r => {
-                return (!cuisineFilter.value || r['Cuisine Keywords'].includes(cuisineFilter.value)) &&
-                       (!cityFilter.value || r['City'] === cityFilter.value) &&
-                       (!neighborhoodFilter.value || r['Neighborhood'] === neighborhoodFilter.value) &&
-                       (!chainFilter.value || r['Chain (Y/N)'] === chainFilter.value);
+                const matchesCuisine = !cuisineFilter.value || (r['Cuisine Keywords'] && r['Cuisine Keywords'].includes(cuisineFilter.value));
+                const matchesCity = !cityFilter.value || r['City'] === cityFilter.value;
+                const matchesNeighborhood = !neighborhoodFilter.value || r['Neighborhood'] === neighborhoodFilter.value;
+                const matchesChain = !chainFilter.value || r['Chain (Y/N)'] === chainFilter.value;
+                return matchesCuisine && matchesCity && matchesNeighborhood && matchesChain;
             });
 
+            console.log(`Filtered ${filtered.length} restaurants for map.`);
             filtered.forEach(r => {
+                if (!r['Coordinates']) {
+                    console.warn(`No coordinates for restaurant: ${r['Restaurant Name']}`);
+                    return;
+                }
                 const [lat, lng] = r['Coordinates'].split(',').map(Number);
+                if (isNaN(lat) || isNaN(lng)) {
+                    console.warn(`Invalid coordinates for ${r['Restaurant Name']}: ${r['Coordinates']}`);
+                    return;
+                }
                 const marker = L.marker([lat, lng]).addTo(map);
                 marker.bindPopup(`<b>${r['Restaurant Name']}</b><br><a href="restaurant.html?id=${r['Restaurant ID']}&back=map.html">View Details</a>`);
                 markers.push(marker);
