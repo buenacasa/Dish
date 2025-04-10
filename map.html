@@ -36,6 +36,12 @@
         const restaurantUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSnHOqrshe73kAA0Sju9du36ApJckFMzeZhypLXmsCd2klE9PTK0SGC3-3COWAQ5oomjWYNLgiGi4ai/pub?gid=499357101&single=true&output=csv";
         let map, restaurants = [];
 
+        // Function to log character codes for debugging
+        function logCharCodes(str, label) {
+            const codes = str.split("").map(char => char.charCodeAt(0));
+            console.log(`${label} char codes:`, codes);
+        }
+
         async function fetchCSV(url) {
             try {
                 const response = await fetch(url);
@@ -79,6 +85,9 @@
                 console.log(`Row ${i} Coordinates:`, coords);
 
                 if (operational && coords && coords.length === 2) {
+                    logCharCodes(coords[0], `Row ${i} Latitude`);
+                    logCharCodes(coords[1], `Row ${i} Longitude`);
+
                     const lat = parseFloat(coords[0]);
                     const lng = parseFloat(coords[1]);
                     if (isNaN(lat) || isNaN(lng)) {
@@ -87,7 +96,7 @@
                     }
 
                     const restaurant = {
-                        id: row[1], name: row[2], keywords: row[3]?.replace(/"/g, "").toLowerCase().trim() || "",
+                        id: row[1], name: row[2], keywords: row[3]?.replace(/"/g, "").trim() || "", // Keep capitalization
                         chain: row[4], city: row[6], neighborhood: row[7], operational
                     };
                     restaurant.marker = L.marker([lat, lng])
