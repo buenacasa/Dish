@@ -2,7 +2,8 @@
 function loadCSV(file, callback) {
     fetch(`data/${file}`)
         .then(response => response.text())
-        .then(data => Papa.parse(data, { header: true, complete: callback }));
+        .then(data => Papa.parse(data, { header: true, complete: callback }))
+        .catch(error => console.error(`Error loading ${file}:`, error));
 }
 
 // Home Page - Load Cuisines
@@ -13,7 +14,7 @@ if (document.getElementById('cuisine-grid')) {
             const tile = document.createElement('div');
             tile.className = 'tile';
             tile.innerHTML = `<img src="${cuisine['Cuisine Image']}" alt="${cuisine['Cuisine ID']}"><p>${cuisine['Cuisine ID']}</p>`;
-            tile.onclick = () => window.location.href = `cuisine.html?cuisine=${cuisine['Cuisine ID']}`;
+            tile.onclick = () => window.location.href = `cuisine.html?cuisine=${encodeURIComponent(cuisine['Cuisine ID'])}`;
             grid.appendChild(tile);
         });
     });
@@ -22,7 +23,7 @@ if (document.getElementById('cuisine-grid')) {
 // Cuisine Page - Load Restaurants
 if (document.getElementById('restaurant-grid')) {
     const urlParams = new URLSearchParams(window.location.search);
-    const cuisine = urlParams.get('cuisine');
+    const cuisine = decodeURIComponent(urlParams.get('cuisine'));
     document.getElementById('cuisine-title').textContent = `${cuisine} Restaurants`;
 
     loadCSV('Restaurant.csv', function(result) {
@@ -36,7 +37,7 @@ if (document.getElementById('restaurant-grid')) {
                 <p class="name">${restaurant['Restaurant Name']}</p>
                 <p class="keywords">${restaurant['Cuisine Keywords']}</p>
             `;
-            tile.onclick = () => window.location.href = `restaurant.html?id=${restaurant['Restaurant ID']}&back=cuisine.html?cuisine=${cuisine}`;
+            tile.onclick = () => window.location.href = `restaurant.html?id=${restaurant['Restaurant ID']}&back=cuisine.html?cuisine=${encodeURIComponent(cuisine)}`;
             grid.appendChild(tile);
         });
     });
@@ -52,7 +53,7 @@ if (document.getElementById('restaurant-profile')) {
     loadCSV('Restaurant.csv', function(result) {
         const restaurant = result.data.find(r => r['Restaurant ID'] === id);
         const profile = document.getElementById('restaurant-profile');
-        const keywords = restaurant['Cuisine Keywords'].split(', ').map(k => `<a href="cuisine.html?cuisine=${k}">${k}</a>`).join(', ');
+        const keywords = restaurant['Cuisine Keywords'].split(', ').map(k => `<a href="cuisine.html?cuisine=${encodeURIComponent(k)}">${k}</a>`).join(', ');
         profile.innerHTML = `
             <img src="${restaurant['Profile Picture']}" alt="${restaurant['Restaurant Name']}">
             <h2>${restaurant['Restaurant Name']}</h2>
@@ -105,7 +106,7 @@ function initMap() {
         neighborhoods.forEach(n => neighborhoodFilter.add(new Option(n, n)));
 
         function updateMap() {
-            map.markers?.forEach(m => m.setMap(null));
+            if (map.markers) map.markers.forEach(m => m.setMap(null));
             map.markers = [];
             const filtered = restaurants.filter(r => {
                 return (!cuisineFilter.value || r['Cuisine Keywords'].includes(cuisineFilter.value)) &&
