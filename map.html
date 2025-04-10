@@ -75,7 +75,7 @@
 
                 const operational = row[10]?.trim().toLowerCase() === "y";
                 const rawCoords = row[11] || "";
-                const coords = rawCoords.replace(/"/g, "").split(",");
+                const coords = rawCoords.replace(/"/g, "").split(",").map(c => c.trim());
                 console.log(`Row ${i} Coordinates:`, coords);
 
                 if (operational && coords && coords.length === 2) {
@@ -87,7 +87,7 @@
                     }
 
                     const restaurant = {
-                        id: row[1], name: row[2], keywords: row[3]?.replace(/"/g, "").toLowerCase() || "",
+                        id: row[1], name: row[2], keywords: row[3]?.replace(/"/g, "").toLowerCase().trim() || "",
                         chain: row[4], city: row[6], neighborhood: row[7], operational
                     };
                     restaurant.marker = L.marker([lat, lng])
@@ -96,7 +96,6 @@
                     console.log(`Added marker for ${restaurant.name} at [${lat}, ${lng}]`);
                     restaurants.push(restaurant);
 
-                    // Split keywords for filters
                     const keywordArray = restaurant.keywords.split(",").map(k => k.trim());
                     keywordArray.forEach(k => cuisineSet.add(k));
                     citySet.add(restaurant.city);
