@@ -36,14 +36,14 @@
             const profile = document.getElementById("profile");
             for (let i = 1; i < data.length; i++) {
                 const row = data[i];
-                if (row[1] === restaurantId) { // Col B: Restaurant ID
-                    const name = row[2]; // Col C
-                    const keywords = row[3]?.split(", ") || []; // Col D
-                    const chain = row[4]; // Col E
-                    const address = row[5]?.replace(/"/g, ""); // Col F
-                    const neighborhood = row[7]; // Col H
-                    const mapsLink = row[8]; // Col I
-                    const profilePic = row[9]; // Col J
+                if (row[1] === restaurantId) {
+                    const name = row[2];
+                    const keywords = row[3]?.split(", ") || [];
+                    const chain = row[4];
+                    const address = row[5]?.replace(/"/g, ""); // Remove quotes
+                    const neighborhood = row[7];
+                    const mapsLink = row[8];
+                    const profilePic = row[9];
 
                     const keywordLinks = keywords.map(k => `<a href="restaurants.html?cuisine=${k}">${k}</a>`).join(", ");
                     profile.innerHTML = `
@@ -53,9 +53,11 @@
                         <p><strong>Chain:</strong> ${chain}</p>
                         <p><strong>Address:</strong> ${address}</p>
                         <p><strong>Neighborhood:</strong> ${neighborhood}</p>
-                        <p><strong>Location:</strong> <a href="${mapsLink}" target="_blank">
-                            <img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" class="map-icon" alt="Map">
-                        </a></p>
+                        <p><strong>Location:</strong> 
+                            <a href="${mapsLink}" target="_blank">
+                                <img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" class="map-icon" alt="Map">
+                            </a>
+                        </p>
                     `;
                     break;
                 }
