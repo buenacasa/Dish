@@ -3,22 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurants</title>
+    <title>Restaurants - The Dish</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-        .tile { text-align: center; cursor: pointer; }
-        .tile img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; }
-        .tile .name { font-size: 18px; margin: 10px 0 5px; }
-        .tile .keywords { font-size: 14px; color: #666; }
-        .back { margin-bottom: 20px; }
-        @media (max-width: 600px) { .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
+        body {
+            background: linear-gradient(to bottom, #fef9e7, #f7e8c3);
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        nav { background: #8b5e3c; padding: 1rem; }
+        nav a { color: white; font-weight: bold; }
     </style>
 </head>
 <body>
-    <a href="index.html" class="back">Back to Cuisines</a>
-    <h1>Restaurants</h1>
-    <div id="restaurant-grid" class="grid"></div>
+    <nav class="text-center">
+        <a href="index.html" class="mx-4">Cuisines</a>
+        <a href="map.html" class="mx-4">Map</a>
+    </nav>
+    <div class="container mx-auto p-6">
+        <a href="index.html" class="text-blue-600 hover:underline mb-4 inline-block">Back to Cuisines</a>
+        <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">Restaurants</h1>
+        <div id="restaurant-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+    </div>
 
     <script>
         const restaurantUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSnHOqrshe73kAA0Sju9du36ApJckFMzeZhypLXmsCd2klE9PTK0SGC3-3COWAQ5oomjWYNLgiGi4ai/pub?gid=499357101&single=true&output=csv";
@@ -28,30 +35,32 @@
         async function fetchCSV(url) {
             const response = await fetch(url);
             const text = await response.text();
-            return text.split("\n").map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)); // Handles commas in quotes
+            return text.split("\n").map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
         }
 
         async function loadRestaurants() {
             const data = await fetchCSV(restaurantUrl);
             const grid = document.getElementById("restaurant-grid");
             grid.innerHTML = "";
-            for (let i = 1; i < data.length; i++) { // Skip header
+            for (let i = 1; i < data.length; i++) {
                 const row = data[i];
-                const operational = row[10]?.trim().toLowerCase() === "yes"; // Col K: Operational (Y/N)
+                const operational = row[10]?.trim().toLowerCase() === "y";
                 if (!operational) continue;
 
-                const restaurantId = row[1]; // Col B
-                const name = row[2]; // Col C
-                const keywords = row[3]?.split(", ") || []; // Col D
-                const profilePic = row[9]; // Col J
+                const restaurantId = row[1];
+                const name = row[2];
+                const keywords = row[3]?.split(", ") || [];
+                const profilePic = row[9];
 
                 if (keywords.includes(cuisineId)) {
                     const tile = document.createElement("div");
-                    tile.className = "tile";
+                    tile.className = "bg-white p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition";
                     tile.innerHTML = `
-                        <img src="${profilePic}" alt="${name}">
-                        <div class="name">${name}</div>
-                        <div class="keywords">${keywords.join(", ")}</div>
+                        <img src="${profilePic}" alt="${name}" class="w-full h-40 object-cover rounded-t-lg">
+                        <div class="mt-2">
+                            <div class="text-lg font-semibold text-gray-800">${name}</div>
+                            <div class="text-sm text-gray-600">${keywords.join(", ")}</div>
+                        </div>
                     `;
                     tile.onclick = () => window.location.href = `profile.html?restaurant=${restaurantId}`;
                     grid.appendChild(tile);
