@@ -1,19 +1,19 @@
 // Load CSV files using PapaParse
 function loadCSV(file, callback) {
     const url = `data/${file}`;
-    console.log(`Fetching: ${url}`); // Debug: Log the exact URL
+    console.log(`Fetching: ${url}`);
     fetch(url)
         .then(response => {
-            console.log(`Response status for ${url}: ${response.status}`); // Debug: Log status
+            console.log(`Response status for ${url}: ${response.status}`);
             if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             return response.text();
         })
         .then(data => {
-            console.log(`Raw data from ${file}:`, data.substring(0, 100)); // Debug: First 100 chars
+            console.log(`Raw data from ${file}:`, data.substring(0, 100));
             Papa.parse(data, { 
                 header: true, 
                 complete: result => {
-                    console.log(`Parsed ${file}:`, result.data); // Debug: Parsed data
+                    console.log(`Parsed ${file}:`, result.data);
                     callback(result);
                 }
             });
@@ -104,13 +104,15 @@ if (document.getElementById('restaurant-profile')) {
     });
 }
 
-// Map Page
-let map;
-function initMap() {
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: 29.4241, lng: -98.4936 }, // San Antonio default
-        zoom: 10
-    });
+// Map Page - Using Leaflet.js
+if (document.getElementById('map')) {
+    // Initialize Leaflet map
+    const map = L.map('map').setView([29.4241, -98.4936], 10); // San Antonio default
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
     loadCSV('Restaurant.csv', function(result) {
         const restaurants = result.data.filter(r => r['Operational (Y/N)'] === 'Y');
@@ -127,24 +129,25 @@ function initMap() {
         cities.forEach(c => cityFilter.add(new Option(c, c)));
         neighborhoods.forEach(n => neighborhoodFilter.add(new Option(n, n)));
 
+        let markers = [];
+
         function updateMap() {
-            if (map.markers) map.markers.forEach(m => m.setMap(null));
-            map.markers = [];
+            // Clear existing markers
+            markers.forEach(marker => marker.remove());
+            markers = [];
+
             const filtered = restaurants.filter(r => {
                 return (!cuisineFilter.value || r['Cuisine Keywords'].includes(cuisineFilter.value)) &&
                        (!cityFilter.value || r['City'] === cityFilter.value) &&
                        (!neighborhoodFilter.value || r['Neighborhood'] === neighborhoodFilter.value) &&
                        (!chainFilter.value || r['Chain (Y/N)'] === chainFilter.value);
             });
+
             filtered.forEach(r => {
                 const [lat, lng] = r['Coordinates'].split(',').map(Number);
-                const marker = new google.maps.Marker({
-                    position: { lat, lng },
-                    map: map,
-                    title: r['Restaurant Name']
-                });
-                marker.addListener('click', () => window.location.href = `restaurant.html?id=${r['Restaurant ID']}&back=map.html`);
-                map.markers.push(marker);
+                const marker = L.marker([lat, lng]).addTo(map);
+                marker.bindPopup(`<b>${r['Restaurant Name']}</b><br><a href="restaurant.html?id=${r['Restaurant ID']}&back=map.html">View Details</a>`);
+                markers.push(marker);
             });
         }
 
