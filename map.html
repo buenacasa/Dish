@@ -87,7 +87,7 @@
                     }
 
                     const restaurant = {
-                        id: row[1], name: row[2], keywords: row[3]?.replace(/"/g, "").split(",").map(k => k.trim().toLowerCase()) || [],
+                        id: row[1], name: row[2], keywords: row[3]?.replace(/"/g, "").toLowerCase() || "",
                         chain: row[4], city: row[6], neighborhood: row[7], operational
                     };
                     restaurant.marker = L.marker([lat, lng])
@@ -96,7 +96,9 @@
                     console.log(`Added marker for ${restaurant.name} at [${lat}, ${lng}]`);
                     restaurants.push(restaurant);
 
-                    restaurant.keywords.forEach(k => cuisineSet.add(k));
+                    // Split keywords for filters
+                    const keywordArray = restaurant.keywords.split(",").map(k => k.trim());
+                    keywordArray.forEach(k => cuisineSet.add(k));
                     citySet.add(restaurant.city);
                     neighborhoodSet.add(restaurant.neighborhood);
                 }
