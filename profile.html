@@ -28,7 +28,10 @@
         async function fetchCSV(url) {
             const response = await fetch(url);
             const text = await response.text();
-            return text.split("\n").map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
+            // Split rows and remove \r from each row
+            const rows = text.split("\n").map(row => row.replace(/\r/g, ""));
+            // Split each row into fields
+            return rows.map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
         }
 
         async function loadProfile() {
@@ -38,7 +41,7 @@
                 const row = data[i];
                 if (row[1] === restaurantId) {
                     const name = row[2];
-                    const keywords = row[3]?.replace(/"/g, "").replace(/\r/g, "").split(",").map(k => k.trim()) || [];
+                    const keywords = row[3]?.replace(/"/g, "").split(",").map(k => k.trim()) || [];
                     const chain = row[4];
                     const address = row[5]?.replace(/"/g, "");
                     const neighborhood = row[7];
