@@ -3,22 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Profile</title>
+    <title>Restaurant Profile - The Dish</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
-        .profile { max-width: 600px; margin: 0 auto; }
-        .profile img { width: 100%; height: 300px; object-fit: cover; border-radius: 8px; }
-        .profile h1 { margin: 20px 0 10px; }
-        .profile a { color: #007bff; text-decoration: none; }
-        .profile a:hover { text-decoration: underline; }
-        .back { margin-bottom: 20px; }
+        body {
+            background: linear-gradient(to bottom, #fef9e7, #f7e8c3);
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        nav { background: #8b5e3c; padding: 1rem; }
+        nav a { color: white; font-weight: bold; }
         .map-icon { width: 24px; height: 24px; vertical-align: middle; }
-        @media (max-width: 600px) { .profile img { height: 200px; } }
     </style>
 </head>
 <body>
-    <a href="javascript:history.back()" class="back">Back to Restaurants</a>
-    <div id="profile" class="profile"></div>
+    <nav class="text-center">
+        <a href="index.html" class="mx-4">Cuisines</a>
+        <a href="map.html" class="mx-4">Map</a>
+    </nav>
+    <div class="container mx-auto p-6">
+        <a href="javascript:history.back()" class="text-blue-600 hover:underline mb-4 inline-block">Back to Restaurants</a>
+        <div id="profile" class="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto"></div>
+    </div>
 
     <script>
         const restaurantUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSnHOqrshe73kAA0Sju9du36ApJckFMzeZhypLXmsCd2klE9PTK0SGC3-3COWAQ5oomjWYNLgiGi4ai/pub?gid=499357101&single=true&output=csv";
@@ -36,26 +43,28 @@
             const profile = document.getElementById("profile");
             for (let i = 1; i < data.length; i++) {
                 const row = data[i];
-                if (row[1] === restaurantId) { // Col B: Restaurant ID
-                    const name = row[2]; // Col C
-                    const keywords = row[3]?.split(", ") || []; // Col D
-                    const chain = row[4]; // Col E
-                    const address = row[5]; // Col F
-                    const neighborhood = row[7]; // Col H
-                    const mapsLink = row[8]; // Col I
-                    const profilePic = row[9]; // Col J
+                if (row[1] === restaurantId) {
+                    const name = row[2];
+                    const keywords = row[3]?.split(", ") || [];
+                    const chain = row[4];
+                    const address = row[5]?.replace(/"/g, ""); // Remove quotes
+                    const neighborhood = row[7];
+                    const mapsLink = row[8];
+                    const profilePic = row[9];
 
-                    const keywordLinks = keywords.map(k => `<a href="restaurants.html?cuisine=${k}">${k}</a>`).join(", ");
+                    const keywordLinks = keywords.map(k => `<a href="restaurants.html?cuisine=${k}" class="text-blue-600 hover:underline">${k}</a>`).join(", ");
                     profile.innerHTML = `
-                        <img src="${profilePic}" alt="${name}">
-                        <h1>${name}</h1>
-                        <p><strong>Cuisine:</strong> ${keywordLinks}</p>
-                        <p><strong>Chain:</strong> ${chain}</p>
-                        <p><strong>Address:</strong> ${address}</p>
-                        <p><strong>Neighborhood:</strong> ${neighborhood}</p>
-                        <p><strong>Location:</strong> <a href="${mapsLink}" target="_blank">
-                            <img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" class="map-icon" alt="Map">
-                        </a></p>
+                        <img src="${profilePic}" alt="${name}" class="w-full h-64 object-cover rounded-lg mb-4">
+                        <h1 class="text-2xl font-bold text-gray-800 mb-2">${name}</h1>
+                        <p><strong class="text-gray-700">Cuisine:</strong> ${keywordLinks}</p>
+                        <p><strong class="text-gray-700">Chain:</strong> ${chain}</p>
+                        <p><strong class="text-gray-700">Address:</strong> ${address}</p>
+                        <p><strong class="text-gray-700">Neighborhood:</strong> ${neighborhood}</p>
+                        <p><strong class="text-gray-700">Location:</strong> 
+                            <a href="${mapsLink}" target="_blank">
+                                <img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" class="map-icon" alt="Map">
+                            </a>
+                        </p>
                     `;
                     break;
                 }
