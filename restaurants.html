@@ -12,12 +12,14 @@
         .tile .name { font-size: 18px; margin: 10px 0 5px; }
         .tile .keywords { font-size: 14px; color: #666; }
         .back { margin-bottom: 20px; }
+        .error { color: red; font-weight: bold; }
         @media (max-width: 600px) { .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); } }
     </style>
 </head>
 <body>
     <a href="index.html" class="back">Back to Cuisines</a>
     <h1>Restaurants</h1>
+    <div id="error" class="error"></div>
     <div id="restaurant-grid" class="grid"></div>
 
     <script>
@@ -26,17 +28,40 @@
         const cuisineId = urlParams.get("cuisine");
 
         async function fetchCSV(url) {
-            const response = await fetch(url);
-            const text = await response.text();
-            return text.split("\n").map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                const text = await response.text();
+                console.log("Raw CSV data:", text); // Debug: Log raw data
+                return text.split("\n").map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
+            } catch (error) {
+                document.getElementById("error").textContent = `Failed to fetch CSV: ${error.message}`;
+                console.error("Fetch error:", error);
+                return [];
+            }
         }
 
         async function loadRestaurants() {
             const data = await fetchCSV(restaurantUrl);
+            if (!data.length) {
+                document.getElementById("error").textContent = "No data received from CSV.";
+                return;
+            }
+
             const grid = document.getElementById("restaurant-grid");
             grid.innerHTML = "";
+            console.log("Parsed CSV data:", data); // Debug: Log parsed data
+
             for (let i = 1; i < data.length; i++) {
                 const row = data[i];
+                console.log(`Row ${i}:`, row); // Debug: Log each row
+
+                // Check if row has enough columns
+                if (row.length < 11) {
+                    console.warn(`Row ${i} has insufficient columns:`, row);
+                    continue;
+                }
+
                 const operational = row[10]?.trim().toLowerCase() === "y";
                 if (!operational) continue;
 
@@ -44,6 +69,8 @@
                 const name = row[2];
                 const keywords = row[3]?.split(", ") || [];
                 const profilePic = row[9];
+
+                console.log(`Cuisine ID: ${cuisineId}, Keywords: ${keywords}`); // Debug: Log comparison
 
                 if (keywords.includes(cuisineId)) {
                     const tile = document.createElement("div");
@@ -56,6 +83,10 @@
                     tile.onclick = () => window.location.href = `profile.html?restaurant=${restaurantId}`;
                     grid.appendChild(tile);
                 }
+            }
+
+            if (!grid.hasChildNodes()) {
+                document.getElementById("error").textContent = `No restaurants found for cuisine: ${cuisineId}`;
             }
         }
 
