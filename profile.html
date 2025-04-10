@@ -38,7 +38,7 @@
                 const row = data[i];
                 if (row[1] === restaurantId) {
                     const name = row[2];
-                    const keywords = row[3]?.replace(/"/g, "").split(",").map(k => k.trim()) || [];
+                    const keywords = row[3]?.replace(/"/g, "").replace(/\r/g, "").split(",").map(k => k.trim()) || [];
                     const chain = row[4];
                     const address = row[5]?.replace(/"/g, "");
                     const neighborhood = row[7];
