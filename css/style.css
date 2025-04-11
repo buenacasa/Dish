@@ -77,7 +77,7 @@ main {
 /* Cuisine and Restaurant grids */
 #cuisine-grid, #restaurant-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
     padding: 20px;
 }
@@ -88,17 +88,12 @@ main {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     text-align: center;
     padding: 10px;
-    width: 200px; /* Fixed width */
-    aspect-ratio: 1 / 1; /* Square aspect ratio */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 #cuisine-grid .tile img, #restaurant-grid .tile img {
     width: 100%;
-    height: 150px; /* Fixed height for the image */
-    object-fit: cover; /* Prevent stretching */
+    height: 150px;
+    object-fit: cover;
     border-radius: 5px;
 }
 
@@ -211,15 +206,12 @@ main {
     min-height: 400px;
 }
 
+/* Apply Montserrat font to Leaflet map */
+.leaflet-container, .leaflet-popup-content {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
 /* Responsive layout */
-.mobile-only {
-    display: none;
-}
-
-.desktop-only {
-    display: block;
-}
-
 @media (max-width: 768px) {
     .split-screen {
         flex-direction: column;
@@ -229,12 +221,8 @@ main {
         width: 100%;
     }
 
-    .mobile-only {
-        display: block;
-    }
-
-    .desktop-only {
-        display: none;
+    #cuisine-grid, #restaurant-grid {
+        grid-template-columns: 1fr; /* Single column on mobile */
     }
 }
 
