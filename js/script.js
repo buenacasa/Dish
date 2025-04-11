@@ -1,6 +1,7 @@
 // Load CSV files
 function loadCSV(file, callback) {
-    const url = `data/${file}`;
+    // Use the full raw GitHub URL to bypass potential GitHub Pages path issues
+    const url = `https://raw.githubusercontent.com/buenacasa/Dish/main/data/${file}`;
     console.log(`Fetching: ${url}`);
     fetch(url)
         .then(response => {
@@ -19,17 +20,31 @@ function loadCSV(file, callback) {
                     if (result.errors.length > 0) {
                         console.error(`Parsing errors in ${file}:`, result.errors);
                     }
+                    if (!result.data || result.data.length === 0) {
+                        console.error(`No data parsed from ${file}`);
+                    }
                     callback(result);
                 }
             });
         })
-        .catch(error => console.error(`Error loading ${file}:`, error));
+        .catch(error => {
+            console.error(`Error loading ${file}:`, error);
+            // Fallback: Display an error message on the page
+            const errorMessage = document.createElement('p');
+            errorMessage.style.color = 'red';
+            errorMessage.textContent = `Failed to load ${file}. Please check the console for details.`;
+            document.body.appendChild(errorMessage);
+        });
 }
 
 // Load cuisine tiles on index.html and cuisine.html
 if (document.getElementById('cuisine-grid')) {
     loadCSV('Cuisine.csv', result => {
         const cuisineGrid = document.getElementById('cuisine-grid');
+        if (!result.data || result.data.length === 0) {
+            console.error('No cuisine data loaded');
+            return;
+        }
         result.data.forEach(cuisine => {
             const tile = document.createElement('div');
             tile.className = 'tile';
@@ -55,6 +70,10 @@ if (document.getElementById('restaurant-grid')) {
         loadCSV('Restaurant.csv', result => {
             const restaurantGrid = document.getElementById('restaurant-grid');
             const cuisineTitle = document.getElementById('cuisine-title');
+            if (!result.data || result.data.length === 0) {
+                console.error('No restaurant data loaded');
+                return;
+            }
             let filteredRestaurants = result.data;
 
             if (cuisine) {
@@ -100,6 +119,10 @@ if (document.getElementById('restaurant-profile')) {
     document.getElementById('back-link').href = cuisine ? `cuisine.html?cuisine=${cuisine}` : 'index.html';
 
     loadCSV('Restaurant.csv', result => {
+        if (!result.data || result.data.length === 0) {
+            console.error('No restaurant data loaded for profile');
+            return;
+        }
         const restaurant = result.data.find(r => r['Restaurant ID'] === restaurantId);
         if (restaurant) {
             const profile = document.getElementById('restaurant-profile');
@@ -112,11 +135,17 @@ if (document.getElementById('restaurant-profile')) {
                 <p><strong>Neighborhood:</strong> ${restaurant['Neighborhood']}</p>
                 <p><a href="${restaurant['Google Maps Link']}" target="_blank"><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Google Maps"></a></p>
             `;
+        } else {
+            console.error(`Restaurant not found for ID: ${restaurantId}`);
         }
     });
 
     loadCSV('Call.csv', result => {
         const callsList = document.getElementById('calls-list');
+        if (!result.data || result.data.length === 0) {
+            console.error('No call data loaded');
+            return;
+        }
         const calls = result.data.filter(call => call['Restaurant ID'] === restaurantId);
         calls.forEach(call => {
             const callDiv = document.createElement('div');
@@ -144,6 +173,10 @@ if (document.getElementById('map')) {
     let restaurants = [];
 
     loadCSV('Restaurant.csv', result => {
+        if (!result.data || result.data.length === 0) {
+            console.error('No restaurant data loaded for map');
+            return;
+        }
         restaurants = result.data;
 
         // Populate filter dropdowns
