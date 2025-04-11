@@ -46,15 +46,20 @@ header .banner::before {
 
 header .banner h1 {
     color: #fff;
-    font-size: 48px;
+    font-size: 56px; /* Increased font size */
     font-weight: 700;
     position: relative;
     z-index: 1;
 }
 
+.description-container {
+    text-align: center;
+    padding: 20px;
+}
+
 header .description {
     max-width: 800px;
-    margin: 20px auto;
+    margin: 0 auto 20px auto; /* Adjusted margin */
     font-size: 16px;
     color: #4a3728;
 }
