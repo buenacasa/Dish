@@ -69,13 +69,14 @@ if (document.getElementById('restaurant-grid')) {
     });
 }
 
-// Restaurant profile on restaurant.html with map on left
+// Restaurant profile on restaurant.html with map on right
 if (document.getElementById('restaurant-profile')) {
     const urlParams = new URLSearchParams(window.location.search);
     const restaurantId = urlParams.get('id');
     const cuisine = urlParams.get('cuisine');
 
     document.getElementById('back-link').href = cuisine ? `cuisine.html?cuisine=${cuisine}` : 'index.html';
+    document.getElementById('home-link').href = 'index.html';
 
     // Load restaurant profile
     loadCSV('Restaurant.csv', result => {
@@ -93,7 +94,7 @@ if (document.getElementById('restaurant-profile')) {
                 <p><strong>Chain:</strong> ${restaurant['Chain (Y/N)']}</p>
                 <p><strong>Address:</strong> ${restaurant['Address']}</p>
                 <p><strong>Neighborhood:</strong> ${restaurant['Neighborhood']}</p>
-                <p><a href="${restaurant['Google Maps Link']}" target="_blank"><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Google Maps"></a></p>
+                <p><a href="${restaurant['Google Maps Link']}" target="_blank"><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Google Maps" style="width: 24px; height: 24px;"></a></p>
             `;
         }
 
@@ -194,15 +195,14 @@ if (document.getElementById('restaurant-profile')) {
                         if (r['Restaurant ID'] === restaurantId) {
                             marker.setIcon(L.icon({
                                 iconUrl: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                                iconSize: [24, 24],
-                                iconAnchor: [12, 24]
+                                iconSize: [72, 72],
+                                iconAnchor: [36, 72]
                             }));
-                            map.setView([r.Latitude, r.Longitude], 15);
                         }
                     }
                 });
 
-                if (filteredRestaurants.length > 0 && !filteredRestaurants.some(r => r['Restaurant ID'] === restaurantId)) {
+                if (filteredRestaurants.length > 0) {
                     const group = new L.featureGroup(markers);
                     map.fitBounds(group.getBounds());
                 }
@@ -330,7 +330,7 @@ if (document.getElementById('map') && !document.getElementById('restaurant-profi
 
             filteredRestaurants.forEach(restaurant => {
                 if (restaurant.Latitude && restaurant.Longitude) {
-                    const marker = L.marker([restaurant.Latitude, r.Longitude]).addTo(map);
+                    const marker = L.marker([restaurant.Latitude, restaurant.Longitude]).addTo(map);
                     marker.bindPopup(`
                         <b>${restaurant['Restaurant Name']}</b><br>
                         ${restaurant['Cuisine Keywords']}<br>
