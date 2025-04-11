@@ -72,6 +72,11 @@ header {
     border-radius: 8px;
 }
 
+#restaurant-profile img[src*="red-dot.png"] {
+    width: 24px;
+    height: 24px;
+}
+
 #calls-list {
     padding: 20px;
 }
