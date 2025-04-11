@@ -7,16 +7,15 @@
 
 /* Body and global styles */
 body {
-    font-family: 'Montserrat', sans-serif; /* Modern sans-serif font */
-    background-color: #f5ede3; /* Light beige background */
-    color: #4a3c31; /* Dark brown text */
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f5ede3;
+    color: #4a3c31;
 }
 
 /* Header styles */
 header {
     text-align: center;
     padding: 20px;
-    /* Removed burnt orange background */
 }
 
 /* Banner (used on home page) */
@@ -30,7 +29,8 @@ header .banner {
     max-width: 1200px;
 }
 
-header h1 {
+/* Header title on home page (inside banner) */
+header .banner h1 {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -39,7 +39,15 @@ header h1 {
     font-size: 48px;
     font-weight: 700;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    /* Removed semi-translucent background */
+}
+
+/* Header title on other pages (not inside banner) */
+header h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #8b5a2b;
+    margin: 20px 0;
 }
 
 /* Description paragraph */
@@ -69,7 +77,7 @@ header h1 {
 .map-link a {
     display: inline-block;
     padding: 12px 24px;
-    background-color: #8b5a2b; /* Darker brown to contrast with light background */
+    background-color: #8b5a2b;
     color: #fff;
     text-decoration: none;
     font-family: 'Montserrat', sans-serif;
@@ -80,7 +88,7 @@ header h1 {
 }
 
 .map-link a:hover {
-    background-color: #6b4a22; /* Even darker brown on hover */
+    background-color: #6b4a22;
 }
 
 /* Cuisine grid (tiles on home page) */
@@ -137,7 +145,6 @@ header h1 {
     color: #8b5a2b;
     text-align: center;
     margin: 20px 0;
-    /* Moved to top, no longer absolute positioned */
 }
 
 /* Restaurant profile page */
@@ -189,6 +196,9 @@ header h1 {
 /* Calls list on restaurant profile page */
 #calls-list {
     margin-top: 20px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .call {
@@ -200,8 +210,9 @@ header h1 {
 
 .call p {
     font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
+    font-size: 16px;
     color: #5e4b3a;
+    line-height: 1.5;
 }
 
 /* Restaurant tiles (make restaurant name more prominent) */
@@ -227,7 +238,6 @@ header h1 {
     justify-content: center;
     gap: 10px;
     padding: 20px;
-    /* Removed burnt orange background */
 }
 
 #filters select {
@@ -247,12 +257,22 @@ header h1 {
     border-radius: 10px;
 }
 
+/* Custom Leaflet map pins */
+.leaflet-marker-icon {
+    background-image: url('https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png');
+    background-size: cover;
+    width: 25px !important;
+    height: 41px !important;
+    margin-left: -12px !important;
+    margin-top: -41px !important;
+}
+
 /* Back links */
 header a {
     display: inline-block;
     margin: 10px;
     padding: 8px 16px;
-    background-color: #8b5a2b; /* Darker brown to contrast with light background */
+    background-color: #8b5a2b;
     color: #fff;
     text-decoration: none;
     font-family: 'Montserrat', sans-serif;
@@ -261,13 +281,9 @@ header a {
 }
 
 header a:hover {
-    background-color: #6b4a22; /* Even darker brown on hover */
+    background-color: #6b4a22;
 }
 
-/* Custom Leaflet map pins */
-.leaflet-marker-icon.custom-marker {
-    filter: hue-rotate(30deg) saturate(2); /* Adjusts blue to a warm tan (#d4a373) */
-}
 /* Feedback form styles */
 #feedback-form {
     max-width: 600px;
@@ -330,6 +346,7 @@ header a:hover {
 #feedback-form button:hover {
     background-color: #6b4a22;
 }
+
 /* Feedback link on home page */
 footer {
     text-align: center;
