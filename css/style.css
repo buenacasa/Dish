@@ -18,6 +18,9 @@ header {
     background-color: #fff;
     padding: 20px;
     text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
 }
 
 header .banner {
@@ -226,8 +229,8 @@ main {
     }
 }
 
-/* Back link */
-#back-link {
+/* Back and Home links */
+#back-link, #home-link {
     display: inline-block;
     padding: 10px 20px;
     background-color: #d4a373;
@@ -237,7 +240,7 @@ main {
     font-weight: 600;
 }
 
-#back-link:hover {
+#back-link:hover, #home-link:hover {
     background-color: #b5895a;
 }
 
@@ -258,6 +261,72 @@ main {
 }
 
 .feedback-link a:hover {
+    background-color: #b5895a;
+}
+
+/* Feedback form */
+#feedback-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+#feedback-form button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #d4a373;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#feedback-form button:hover {
+    background-color: #b5895a;
+}
+
+.back-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #d4a373;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
+    margin: 20px;
+}
+
+.back-link:hover {
     background-color: #b5895a;
 }
 
