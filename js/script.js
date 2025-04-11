@@ -84,6 +84,50 @@ if (document.getElementById('cuisine-grid')) {
 }
 
 // Load restaurant grid on restaurant.html
+if (document.getElementById('restaurant-grid')) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const cuisine = urlParams.get('cuisine');
+    const restaurantId = urlParams.get('id');
+
+    if (cuisine || document.getElementById('restaurant-grid')) {
+        loadCSV('Restaurant.csv', result => {
+            const restaurantGrid = document.getElementById('restaurant-grid');
+            let filteredRestaurants = result.data;
+
+            if (cuisine) {
+                filteredRestaurants = result.data.filter(r => r.Cuisine === cuisine);
+            }
+
+            filteredRestaurants.forEach(restaurant => {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.innerHTML = `
+                    <img src="${restaurant['Restaurant Image']}" alt="${restaurant['Restaurant ID']}">
+                    <p class="name">${restaurant['Restaurant ID']}</p>
+                    <p class="keywords">${restaurant['Cuisine']}</p>
+                `;
+                tile.addEventListener('click', () => {
+                    window.location.href = `restaurant.html?id=${restaurant['Restaurant ID']}&cuisine=${cuisine || ''}`;
+                });
+                restaurantGrid.appendChild(tile);
+            });
+
+            // Highlight the selected restaurant
+            if (restaurantId) {
+                const selectedTile = Array.from(restaurantGrid.children).find(tile => 
+                    tile.querySelector('.name').textContent === restaurantId
+                );
+                if (selectedTile) {
+                    selectedTile.style.backgroundColor = '#d4a373';
+                    selectedTile.style.color = '#fff';
+                    selectedTile.querySelector('.keywords').style.color = '#fff';
+                }
+            }
+        });
+    }
+}
+
+// Load restaurant profile on restaurant.html
 if (document.getElementById('restaurant-profile')) {
     const urlParams = new URLSearchParams(window.location.search);
     const restaurantId = urlParams.get('id');
@@ -91,43 +135,6 @@ if (document.getElementById('restaurant-profile')) {
 
     document.getElementById('back-link').href = cuisine ? `cuisine.html?cuisine=${cuisine}` : 'index.html';
 
-    // Load restaurant grid for the selected cuisine
-    loadCSV('Restaurant.csv', result => {
-        const restaurantGrid = document.getElementById('restaurant-grid');
-        let filteredRestaurants = result.data;
-
-        if (cuisine) {
-            filteredRestaurants = result.data.filter(r => r.Cuisine === cuisine);
-        }
-
-        filteredRestaurants.forEach(restaurant => {
-            const tile = document.createElement('div');
-            tile.className = 'tile';
-            tile.innerHTML = `
-                <img src="${restaurant['Restaurant Image']}" alt="${restaurant['Restaurant ID']}">
-                <p class="name">${restaurant['Restaurant ID']}</p>
-                <p class="keywords">${restaurant['Cuisine']}</p>
-            `;
-            tile.addEventListener('click', () => {
-                window.location.href = `restaurant.html?id=${restaurant['Restaurant ID']}&cuisine=${cuisine || ''}`;
-            });
-            restaurantGrid.appendChild(tile);
-        });
-
-        // Highlight the selected restaurant
-        if (restaurantId) {
-            const selectedTile = Array.from(restaurantGrid.children).find(tile => 
-                tile.querySelector('.name').textContent === restaurantId
-            );
-            if (selectedTile) {
-                selectedTile.style.backgroundColor = '#d4a373';
-                selectedTile.style.color = '#fff';
-                selectedTile.querySelector('.keywords').style.color = '#fff';
-            }
-        }
-    });
-
-    // Load restaurant profile
     loadCSV('Restaurant.csv', result => {
         const restaurant = result.data.find(r => r['Restaurant ID'] === restaurantId);
         if (restaurant) {
@@ -141,6 +148,8 @@ if (document.getElementById('restaurant-profile')) {
                 <p><strong>Neighborhood:</strong> ${restaurant['Neighborhood']}</p>
                 <p><a href="${restaurant['Google Maps Link']}" target="_blank"><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Google Maps"></a></p>
             `;
+        } else {
+            console.error(`Restaurant not found for ID: ${restaurantId}`);
         }
     });
 
@@ -227,6 +236,7 @@ if (document.getElementById('map')) {
                 return matchesCuisine && matchesCity && matchesNeighborhood && matchesChain && matchesKeyword;
             });
 
+            console.log('Search keyword:', searchKeyword);
             console.log('Filtered restaurants:', filteredRestaurants);
 
             filteredRestaurants.forEach(restaurant => {
@@ -259,6 +269,11 @@ if (document.getElementById('map')) {
         neighborhoodFilter.addEventListener('change', updateMarkers);
         chainFilter.addEventListener('change', updateMarkers);
         restaurantFilter.addEventListener('input', updateMarkers);
+        restaurantFilter.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                updateMarkers();
+            }
+        });
 
         updateMarkers();
     });
