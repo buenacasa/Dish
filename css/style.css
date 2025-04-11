@@ -157,6 +157,8 @@ header h1 {
 /* Restaurant profile page */
 #restaurant-profile {
     max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
     margin: 20px auto;
     padding: 20px;
     background-color: #fff;
