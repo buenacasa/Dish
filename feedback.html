@@ -19,11 +19,8 @@
                 <label for="restaurant-name">Restaurant Name:</label>
                 <input type="text" id="restaurant-name" name="restaurant-name" required>
 
-                <label for="cuisine">Cuisine Type:</label>
-                <input type="text" id="cuisine" name="cuisine" placeholder="e.g., Italian, BBQ" required>
-
-                <label for="location">Location (City, Neighborhood):</label>
-                <input type="text" id="location" name="location" placeholder="e.g., San Antonio, Alamo Heights" required>
+                <label for="address">Address:</label>
+                <input type="text" id="address" name="address" placeholder="e.g., 123 Main St, San Antonio, Alamo Heights" required>
 
                 <label for="sentiment">Sentiment:</label>
                 <select id="sentiment" name="sentiment" required>
@@ -31,14 +28,11 @@
                     <option value="Zing">Zing</option>
                 </select>
 
-                <label for="recommendation">Recommended Dishes or Quotes:</label>
-                <textarea id="recommendation" name="recommendation" rows="3" placeholder="e.g., The best tacos I’ve ever had!" required></textarea>
+                <label for="recommendation">If you’re giving Praise, tell us your favorite dish(es)! If it’s a Zing, what would you prefer instead? (Just a few words):</label>
+                <textarea id="recommendation" name="recommendation" rows="3" placeholder="e.g., Loved the tacos! or Could use more spice" required></textarea>
 
-                <label for="highlights">Highlights of Your Experience:</label>
-                <textarea id="highlights" name="highlights" rows="5" placeholder="Tell us more about your visit..." required></textarea>
-
-                <label for="comments">Additional Comments (Optional):</label>
-                <textarea id="comments" name="comments" rows="3" placeholder="Any other thoughts?"></textarea>
+                <label for="experience">Tell us more about your experience:</label>
+                <textarea id="experience" name="experience" rows="5" placeholder="What did you think of the food, atmosphere, or service?" required></textarea>
 
                 <button type="submit">Submit Your Experience</button>
             </form>
