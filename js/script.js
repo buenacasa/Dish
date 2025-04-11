@@ -41,6 +41,9 @@ if (document.getElementById('restaurant-grid')) {
     const urlParams = new URLSearchParams(window.location.search);
     const cuisine = urlParams.get('cuisine');
 
+    document.getElementById('back-link').href = 'index.html';
+    document.getElementById('home-link').href = 'index.html';
+
     loadCSV('Restaurant.csv', result => {
         const restaurantGrid = document.getElementById('restaurant-grid');
         const cuisineTitle = document.getElementById('cuisine-title');
@@ -94,7 +97,7 @@ if (document.getElementById('restaurant-profile')) {
                 <p><strong>Chain:</strong> ${restaurant['Chain (Y/N)']}</p>
                 <p><strong>Address:</strong> ${restaurant['Address']}</p>
                 <p><strong>Neighborhood:</strong> ${restaurant['Neighborhood']}</p>
-                <p><a href="${restaurant['Google Maps Link']}" target="_blank"><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Google Maps" style="width: 24px; height: 24px;"></a></p>
+                <p><strong>View on Google Maps:</strong> <a href="${restaurant['Google Maps Link']}" target="_blank"><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Google Maps" style="width: 24px; height: 24px;"></a></p>
             `;
         }
 
@@ -162,7 +165,7 @@ if (document.getElementById('restaurant-profile')) {
                 chainFilter.appendChild(option);
             });
 
-            function updateMarkers() {
+            function updateMarkers(initialLoad = false) {
                 markers.forEach(marker => map.removeLayer(marker));
                 markers = [];
 
@@ -195,29 +198,32 @@ if (document.getElementById('restaurant-profile')) {
                         if (r['Restaurant ID'] === restaurantId) {
                             marker.setIcon(L.icon({
                                 iconUrl: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                                iconSize: [72, 72],
-                                iconAnchor: [36, 72]
+                                iconSize: [48, 48],
+                                iconAnchor: [24, 48]
                             }));
+                            if (initialLoad) {
+                                map.setView([r.Latitude, r.Longitude], 15);
+                            }
                         }
                     }
                 });
 
-                if (filteredRestaurants.length > 0) {
+                if (!initialLoad && filteredRestaurants.length > 0) {
                     const group = new L.featureGroup(markers);
                     map.fitBounds(group.getBounds());
                 }
             }
 
-            cuisineFilter.addEventListener('change', updateMarkers);
-            cityFilter.addEventListener('change', updateMarkers);
-            neighborhoodFilter.addEventListener('change', updateMarkers);
-            chainFilter.addEventListener('change', updateMarkers);
-            restaurantFilter.addEventListener('input', updateMarkers);
+            cuisineFilter.addEventListener('change', () => updateMarkers());
+            cityFilter.addEventListener('change', () => updateMarkers());
+            neighborhoodFilter.addEventListener('change', () => updateMarkers());
+            chainFilter.addEventListener('change', () => updateMarkers());
+            restaurantFilter.addEventListener('input', () => updateMarkers());
             restaurantFilter.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') updateMarkers();
             });
 
-            updateMarkers();
+            updateMarkers(true);
         }
     });
 
@@ -240,6 +246,9 @@ if (document.getElementById('restaurant-profile')) {
 
 // Map page logic (map.html)
 if (document.getElementById('map') && !document.getElementById('restaurant-profile')) {
+    document.getElementById('back-link').href = 'index.html';
+    document.getElementById('home-link').href = 'index.html';
+
     const map = L.map('map').setView([29.4241, -98.4936], 10);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -357,4 +366,12 @@ if (document.getElementById('map') && !document.getElementById('restaurant-profi
 
         updateMarkers();
     });
+}
+
+// Feedback page logic (feedback.html)
+if (document.getElementById('feedback-form')) {
+    document.getElementById('back-link').addEventListener('click', () => {
+        window.history.back();
+    });
+    document.getElementById('home-link').href = 'index.html';
 }
