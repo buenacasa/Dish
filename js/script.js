@@ -17,7 +17,7 @@ function loadCSV(file, callback) {
         .catch(error => console.error(`Error loading ${file}:`, error));
 }
 
-// Cuisine tiles on index.html and cuisine.html
+// Cuisine tiles on index.html
 if (document.getElementById('cuisine-grid')) {
     loadCSV('Cuisine.csv', result => {
         const cuisineGrid = document.getElementById('cuisine-grid');
@@ -37,7 +37,7 @@ if (document.getElementById('cuisine-grid')) {
 }
 
 // Restaurant grid on cuisine.html
-if (document.getElementById('restaurant-grid') && !document.getElementById('restaurant-profile')) {
+if (document.getElementById('restaurant-grid')) {
     const urlParams = new URLSearchParams(window.location.search);
     const cuisine = urlParams.get('cuisine');
 
@@ -69,41 +69,13 @@ if (document.getElementById('restaurant-grid') && !document.getElementById('rest
     });
 }
 
-// Restaurant profile on restaurant.html with map on left (desktop)
+// Restaurant profile on restaurant.html with map on left
 if (document.getElementById('restaurant-profile')) {
     const urlParams = new URLSearchParams(window.location.search);
     const restaurantId = urlParams.get('id');
     const cuisine = urlParams.get('cuisine');
 
     document.getElementById('back-link').href = cuisine ? `cuisine.html?cuisine=${cuisine}` : 'index.html';
-
-    // Load restaurant grid for mobile view
-    if (document.getElementById('restaurant-grid')) {
-        loadCSV('Restaurant.csv', result => {
-            const restaurantGrid = document.getElementById('restaurant-grid');
-            let filteredRestaurants = result.data;
-
-            if (cuisine) {
-                filteredRestaurants = result.data.filter(r => 
-                    r['Cuisine Keywords'].split(',').map(k => k.trim()).includes(cuisine)
-                );
-            }
-
-            filteredRestaurants.forEach(restaurant => {
-                const tile = document.createElement('div');
-                tile.className = 'tile';
-                tile.innerHTML = `
-                    <img src="${restaurant['Profile Picture']}" alt="${restaurant['Restaurant Name']}">
-                    <p class="name">${restaurant['Restaurant Name']}</p>
-                    <p class="keywords">${restaurant['Cuisine Keywords']}</p>
-                `;
-                tile.addEventListener('click', () => {
-                    window.location.href = `restaurant.html?id=${restaurant['Restaurant ID']}&cuisine=${cuisine || ''}`;
-                });
-                restaurantGrid.appendChild(tile);
-            });
-        });
-    }
 
     // Load restaurant profile
     loadCSV('Restaurant.csv', result => {
@@ -125,7 +97,7 @@ if (document.getElementById('restaurant-profile')) {
             `;
         }
 
-        // Load map for desktop view
+        // Load map
         if (document.getElementById('map')) {
             const map = L.map('map').setView([29.4241, -98.4936], 10);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -177,6 +149,18 @@ if (document.getElementById('restaurant-profile')) {
                 neighborhoodFilter.appendChild(option);
             });
 
+            const chainOptions = [
+                { value: '', text: 'All Restaurants' },
+                { value: 'Yes', text: 'Chain Restaurants' },
+                { value: 'No', text: 'Individual Restaurants' }
+            ];
+            chainOptions.forEach(opt => {
+                const option = document.createElement('option');
+                option.value = opt.value;
+                option.textContent = opt.text;
+                chainFilter.appendChild(option);
+            });
+
             function updateMarkers() {
                 markers.forEach(marker => map.removeLayer(marker));
                 markers = [];
@@ -207,11 +191,11 @@ if (document.getElementById('restaurant-profile')) {
                         `);
                         markers.push(marker);
 
-                        // Highlight the selected restaurant
                         if (r['Restaurant ID'] === restaurantId) {
                             marker.setIcon(L.icon({
                                 iconUrl: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                                iconSize: [32, 32]
+                                iconSize: [24, 24],
+                                iconAnchor: [12, 24]
                             }));
                             map.setView([r.Latitude, r.Longitude], 15);
                         }
@@ -290,7 +274,7 @@ if (document.getElementById('map') && !document.getElementById('restaurant-profi
         const allCuisines = restaurants.flatMap(r => r['Cuisine Keywords'].split(',').map(k => k.trim()));
         const uniqueCuisines = [...new Set(allCuisines)].sort();
         uniqueCuisines.forEach(cuisine => {
-            const option = document.createElement('div');
+            const option = document.createElement('option');
             option.value = cuisine;
             option.textContent = cuisine;
             cuisineFilter.appendChild(option);
@@ -310,6 +294,18 @@ if (document.getElementById('map') && !document.getElementById('restaurant-profi
             option.value = neighborhood;
             option.textContent = neighborhood;
             neighborhoodFilter.appendChild(option);
+        });
+
+        const chainOptions = [
+            { value: '', text: 'All Restaurants' },
+            { value: 'Yes', text: 'Chain Restaurants' },
+            { value: 'No', text: 'Individual Restaurants' }
+        ];
+        chainOptions.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt.value;
+            option.textContent = opt.text;
+            chainFilter.appendChild(option);
         });
 
         function updateMarkers() {
@@ -334,7 +330,7 @@ if (document.getElementById('map') && !document.getElementById('restaurant-profi
 
             filteredRestaurants.forEach(restaurant => {
                 if (restaurant.Latitude && restaurant.Longitude) {
-                    const marker = L.marker([restaurant.Latitude, restaurant.Longitude]).addTo(map);
+                    const marker = L.marker([restaurant.Latitude, r.Longitude]).addTo(map);
                     marker.bindPopup(`
                         <b>${restaurant['Restaurant Name']}</b><br>
                         ${restaurant['Cuisine Keywords']}<br>
