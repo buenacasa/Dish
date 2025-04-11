@@ -240,7 +240,8 @@ header h1 {
     padding: 20px;
 }
 
-#filters select {
+#filters select,
+#filters input {
     padding: 8px;
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
@@ -248,6 +249,10 @@ header h1 {
     border-radius: 5px;
     background-color: #d4a373;
     color: #fff;
+}
+
+#filters input::placeholder {
+    color: #f5ede3;
 }
 
 #map {
@@ -282,6 +287,38 @@ header a {
 
 header a:hover {
     background-color: #6b4a22;
+}
+
+/* Split-screen layout for desktop */
+.split-screen {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.split-left, .split-right {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Single-column layout for mobile */
+@media (max-width: 768px) {
+    .split-screen {
+        flex-direction: column;
+    }
+
+    .split-left, .split-right {
+        flex: none;
+        width: 100%;
+    }
+
+    /* Hide restaurant grid on restaurant.html in mobile view */
+    #restaurant-grid {
+        display: none;
+    }
 }
 
 /* Feedback form styles */
@@ -351,6 +388,22 @@ header a:hover {
 footer {
     text-align: center;
     padding: 20px;
+    background-color: #d4a373;
+    color: #4a3c31;
+}
+
+footer .license {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+}
+
+footer .license a {
+    color: #8b5a2b;
+    text-decoration: none;
+}
+
+footer .license a:hover {
+    text-decoration: underline;
 }
 
 .feedback-link a {
