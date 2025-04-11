@@ -6,21 +6,22 @@
     <title>The Dish - Map</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Add Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
     <header>
         <a href="index.html">Back to Home</a>
+        <h1>Restaurant Map</h1>
     </header>
-    <div id="filters">
-        <select id="cuisine-filter"><option value="">All Cuisines</option></select>
-        <select id="city-filter"><option value="">All Cities</option></select>
-        <select id="neighborhood-filter"><option value="">All Neighborhoods</option></select>
-        <select id="chain-filter"><option value="">Chain (All)</option><option value="Yes">Yes</option><option value="No">No</option></select>
-    </div>
-    <div id="map"></div>
-    <!-- Add Leaflet JS -->
+    <main>
+        <div id="filters">
+            <select id="cuisine-filter"><option value="">All Cuisines</option></select>
+            <select id="city-filter"><option value="">All Cities</option></select>
+            <select id="neighborhood-filter"><option value="">All Neighborhoods</option></select>
+            <select id="chain-filter"><option value="">Chain</option><option value="Yes">Yes</option><option value="No">No</option></select>
+        </div>
+        <div id="map"></div>
+    </main>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="js/script.js"></script>
