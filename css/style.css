@@ -7,19 +7,19 @@
 
 /* Body and global styles */
 body {
-    font-family: 'Playfair Display', serif; /* Elegant, food-inspired font */
-    background-color: #f5ede3; /* Light beige background, like parchment */
-    color: #4a3c31; /* Dark brown text for warmth */
+    font-family: 'Montserrat', sans-serif; /* Modern sans-serif font */
+    background-color: #f5ede3; /* Light beige background */
+    color: #4a3c31; /* Dark brown text */
 }
 
 /* Header styles */
 header {
     text-align: center;
     padding: 20px;
-    background-color: #8b5a2b; /* Rich brown, like wood */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Removed burnt orange background */
 }
 
+/* Banner (used on home page) */
 header .banner {
     height: 300px;
     background-size: cover;
@@ -39,18 +39,16 @@ header h1 {
     font-size: 48px;
     font-weight: 700;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    background-color: rgba(0, 0, 0, 0.3); /* Slight background for readability */
-    padding: 10px 20px;
-    border-radius: 5px;
+    /* Removed semi-translucent background */
 }
 
 /* Description paragraph */
 .description {
-    font-family: 'Lora', serif; /* Warm, readable serif font */
+    font-family: 'Montserrat', sans-serif;
     font-size: 18px;
     line-height: 1.6;
     margin: 20px 0;
-    color: #5e4b3a; /* Slightly lighter brown for contrast */
+    color: #5e4b3a;
 }
 
 /* Center and limit width on desktop */
@@ -71,18 +69,18 @@ header h1 {
 .map-link a {
     display: inline-block;
     padding: 12px 24px;
-    background-color: #d4a373; /* Warm tan color */
+    background-color: #8b5a2b; /* Darker brown to contrast with light background */
     color: #fff;
     text-decoration: none;
-    font-family: 'Lora', serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 18px;
-    font-weight: bold;
+    font-weight: 600;
     border-radius: 5px;
     transition: background-color 0.3s;
 }
 
 .map-link a:hover {
-    background-color: #c68e55; /* Slightly darker tan on hover */
+    background-color: #6b4a22; /* Even darker brown on hover */
 }
 
 /* Cuisine grid (tiles on home page) */
@@ -117,7 +115,7 @@ header h1 {
 .tile p {
     text-align: center;
     padding: 10px;
-    font-family: 'Lora', serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 16px;
     color: #4a3c31;
 }
@@ -133,11 +131,13 @@ header h1 {
 }
 
 #cuisine-title {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 32px;
+    font-weight: 700;
     color: #8b5a2b;
     text-align: center;
     margin: 20px 0;
+    /* Moved to top, no longer absolute positioned */
 }
 
 /* Restaurant profile page */
@@ -158,14 +158,15 @@ header h1 {
 }
 
 #restaurant-profile h2 {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 28px;
+    font-weight: 700;
     color: #8b5a2b;
     margin: 15px 0;
 }
 
 #restaurant-profile p {
-    font-family: 'Lora', serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 16px;
     color: #5e4b3a;
     margin: 10px 0;
@@ -198,9 +199,25 @@ header h1 {
 }
 
 .call p {
-    font-family: 'Lora', serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 14px;
     color: #5e4b3a;
+}
+
+/* Restaurant tiles (make restaurant name more prominent) */
+.tile .name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #4a3c31;
+    margin: 5px 0;
+}
+
+.tile .keywords {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    color: #5e4b3a;
+    margin: 0;
 }
 
 /* Map page filters */
@@ -210,12 +227,12 @@ header h1 {
     justify-content: center;
     gap: 10px;
     padding: 20px;
-    background-color: #8b5a2b;
+    /* Removed burnt orange background */
 }
 
 #filters select {
     padding: 8px;
-    font-family: 'Lora', serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 14px;
     border: none;
     border-radius: 5px;
@@ -235,14 +252,19 @@ header a {
     display: inline-block;
     margin: 10px;
     padding: 8px 16px;
-    background-color: #d4a373;
+    background-color: #8b5a2b; /* Darker brown to contrast with light background */
     color: #fff;
     text-decoration: none;
-    font-family: 'Lora', serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 16px;
     border-radius: 5px;
 }
 
 header a:hover {
-    background-color: #c68e55;
+    background-color: #6b4a22; /* Even darker brown on hover */
+}
+
+/* Custom Leaflet map pins */
+.leaflet-marker-icon.custom-marker {
+    filter: hue-rotate(30deg) saturate(2); /* Adjusts blue to a warm tan (#d4a373) */
 }
