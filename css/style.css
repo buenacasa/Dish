@@ -192,12 +192,12 @@ main {
 
 /* Desktop view */
 .split-left {
-    width: 40%;
+    width: 37%; /* Adjusted split ratio */
     overflow-y: auto;
 }
 
 .split-right {
-    width: 60%;
+    width: 63%; /* Adjusted split ratio */
     overflow-y: auto;
 }
 
@@ -205,7 +205,7 @@ main {
 #map-container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 200px); /* Adjust for header, footer, and other content */
+    height: calc(100vh - 300px); /* Reduced height to show Share button */
 }
 
 /* Ensure the map takes the remaining space */
