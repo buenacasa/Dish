@@ -77,21 +77,30 @@ if (document.getElementById('restaurant-profile')) {
 
     document.getElementById('back-link').href = cuisine ? `cuisine.html?cuisine=${cuisine}` : 'index.html';
 
-    // Load cuisine grid for mobile view
-    if (document.getElementById('cuisine-grid')) {
-        loadCSV('Cuisine.csv', result => {
-            const cuisineGrid = document.getElementById('cuisine-grid');
-            result.data.forEach(cuisine => {
+    // Load restaurant grid for mobile view
+    if (document.getElementById('restaurant-grid')) {
+        loadCSV('Restaurant.csv', result => {
+            const restaurantGrid = document.getElementById('restaurant-grid');
+            let filteredRestaurants = result.data;
+
+            if (cuisine) {
+                filteredRestaurants = result.data.filter(r => 
+                    r['Cuisine Keywords'].split(',').map(k => k.trim()).includes(cuisine)
+                );
+            }
+
+            filteredRestaurants.forEach(restaurant => {
                 const tile = document.createElement('div');
                 tile.className = 'tile';
                 tile.innerHTML = `
-                    <img src="${cuisine['Cuisine Image']}" alt="${cuisine['Cuisine ID']}">
-                    <p>${cuisine['Cuisine ID']}</p>
+                    <img src="${restaurant['Profile Picture']}" alt="${restaurant['Restaurant Name']}">
+                    <p class="name">${restaurant['Restaurant Name']}</p>
+                    <p class="keywords">${restaurant['Cuisine Keywords']}</p>
                 `;
                 tile.addEventListener('click', () => {
-                    window.location.href = `cuisine.html?cuisine=${cuisine['Cuisine ID']}`;
+                    window.location.href = `restaurant.html?id=${restaurant['Restaurant ID']}&cuisine=${cuisine || ''}`;
                 });
-                cuisineGrid.appendChild(tile);
+                restaurantGrid.appendChild(tile);
             });
         });
     }
@@ -281,7 +290,7 @@ if (document.getElementById('map') && !document.getElementById('restaurant-profi
         const allCuisines = restaurants.flatMap(r => r['Cuisine Keywords'].split(',').map(k => k.trim()));
         const uniqueCuisines = [...new Set(allCuisines)].sort();
         uniqueCuisines.forEach(cuisine => {
-            const option = document.createElement('option');
+            const option = document.createElement('div');
             option.value = cuisine;
             option.textContent = cuisine;
             cuisineFilter.appendChild(option);
