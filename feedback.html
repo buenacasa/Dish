@@ -9,31 +9,37 @@
 </head>
 <body>
     <header>
-        <a href="index.html">Back to Home</a>
-        <h1>Share Your Restaurant Experience</h1>
+        <a id="back-link">Back</a>
+        <a id="home-link">Home</a>
     </header>
     <main>
+        <h1>Share Your Restaurant Experience</h1>
         <section id="feedback-form">
             <p>We’d love to hear about your dining experiences in San Antonio and South Texas! Share your thoughts on a restaurant, and your story might be featured on The Dish.</p>
             <form action="https://formspree.io/f/your-form-id" method="POST">
-                <label for="restaurant-name">Restaurant Name:</label>
-                <input type="text" id="restaurant-name" name="restaurant-name" required>
-
-                <label for="address">Address:</label>
-                <input type="text" id="address" name="address" placeholder="e.g., 123 Main St, San Antonio, Alamo Heights" required>
-
-                <label for="sentiment">Sentiment:</label>
-                <select id="sentiment" name="sentiment" required>
-                    <option value="Praise">Praise</option>
-                    <option value="Zing">Zing</option>
-                </select>
-
-                <label for="recommendation">If you’re giving Praise, tell us your favorite dish(es)! If it’s a Zing, what would you prefer instead? (Just a few words):</label>
-                <textarea id="recommendation" name="recommendation" rows="3" placeholder="e.g., Loved the tacos! or Could use more spice" required></textarea>
-
-                <label for="experience">Tell us more about your experience:</label>
-                <textarea id="experience" name="experience" rows="5" placeholder="What did you think of the food, atmosphere, or service?" required></textarea>
-
+                <div class="form-group">
+                    <label for="restaurant-name">Restaurant Name:</label>
+                    <input type="text" id="restaurant-name" name="restaurant-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address:</label>
+                    <input type="text" id="address" name="address" placeholder="e.g., 123 Main St, San Antonio, Alamo Heights" required>
+                </div>
+                <div class="form-group">
+                    <label for="sentiment">Sentiment:</label>
+                    <select id="sentiment" name="sentiment" required>
+                        <option value="Praise">Praise</option>
+                        <option value="Zing">Zing</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="recommendation">If you’re giving Praise, tell us your favorite dish(es)! If it’s a Zing, what would you prefer instead? (Just a few words):</label>
+                    <textarea id="recommendation" name="recommendation" rows="3" placeholder="e.g., Loved the tacos! or Could use more spice" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="experience">Tell us more about your experience:</label>
+                    <textarea id="experience" name="experience" rows="5" placeholder="What did you think of the food, atmosphere, or service?" required></textarea>
+                </div>
                 <button type="submit">Submit Your Experience</button>
             </form>
         </section>
@@ -41,5 +47,6 @@
     <footer>
         <p class="license">© 2025 The Dish. Licensed under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.</p>
     </footer>
+    <script src="js/script.js"></script>
 </body>
 </html>
