@@ -13,9 +13,14 @@
 <body>
     <header>
         <a id="back-link">Back</a>
+        <a id="home-link">Home</a>
     </header>
     <main class="split-screen">
         <section class="split-left">
+            <div id="restaurant-profile"></div>
+            <div id="calls-list"></div>
+        </section>
+        <section class="split-right">
             <div id="map-container">
                 <div id="map-filters">
                     <select id="cuisine-filter"><option value="">All Cuisines</option></select>
@@ -27,11 +32,10 @@
                 <div id="map"></div>
             </div>
         </section>
-        <section class="split-right">
-            <div id="restaurant-profile"></div>
-            <div id="calls-list"></div>
-        </section>
     </main>
+    <div class="feedback-link">
+        <a href="feedback.html">Share Your Restaurant Experience</a>
+    </div>
     <footer>
         <p class="license">© 2025 The Dish. Licensed under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.</p>
     </footer>
