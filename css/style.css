@@ -106,3 +106,32 @@ header {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
 }
+/* Existing styles (if any) */
+
+/* Style for the map link on the home page */
+.map-link {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.map-link a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50; /* Green background */
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.map-link a:hover {
+    background-color: #45a049; /* Slightly darker green on hover */
+}
+
+/* Style for the map icon (from previous fix) */
+#restaurant-profile img[src*="red-dot.png"] {
+    width: 24px;
+    height: 24px;
+}
