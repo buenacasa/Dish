@@ -27,7 +27,7 @@ function loadCSV(file, callback) {
 }
 
 // Load cuisine tiles on index.html and cuisine.html
-function loadCuisineTiles() {
+if (document.getElementById('cuisine-grid')) {
     loadCSV('Cuisine.csv', result => {
         const cuisineGrid = document.getElementById('cuisine-grid');
         result.data.forEach(cuisine => {
@@ -45,45 +45,7 @@ function loadCuisineTiles() {
     });
 }
 
-if (document.getElementById('cuisine-grid')) {
-    const isCuisinePage = window.location.pathname.includes('cuisine.html');
-    if (!isCuisinePage) {
-        // On index.html, load cuisine tiles
-        loadCuisineTiles();
-    } else {
-        // On cuisine.html, load cuisine tiles and filtered restaurants
-        loadCuisineTiles();
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const cuisine = urlParams.get('cuisine');
-
-        if (cuisine) {
-            loadCSV('Restaurant.csv', result => {
-                const restaurantGrid = document.getElementById('restaurant-grid');
-                const cuisineTitle = document.getElementById('cuisine-title');
-                const filteredRestaurants = result.data.filter(r => r.Cuisine === cuisine);
-
-                cuisineTitle.textContent = `${cuisine} Restaurants`;
-
-                filteredRestaurants.forEach(restaurant => {
-                    const tile = document.createElement('div');
-                    tile.className = 'tile';
-                    tile.innerHTML = `
-                        <img src="${restaurant['Restaurant Image']}" alt="${restaurant['Restaurant ID']}">
-                        <p class="name">${restaurant['Restaurant ID']}</p>
-                        <p class="keywords">${restaurant['Cuisine']}</p>
-                    `;
-                    tile.addEventListener('click', () => {
-                        window.location.href = `restaurant.html?id=${restaurant['Restaurant ID']}&cuisine=${cuisine}`;
-                    });
-                    restaurantGrid.appendChild(tile);
-                });
-            });
-        }
-    }
-}
-
-// Load restaurant grid on restaurant.html
+// Load restaurant grid on cuisine.html and restaurant.html
 if (document.getElementById('restaurant-grid')) {
     const urlParams = new URLSearchParams(window.location.search);
     const cuisine = urlParams.get('cuisine');
@@ -92,10 +54,12 @@ if (document.getElementById('restaurant-grid')) {
     if (cuisine || document.getElementById('restaurant-grid')) {
         loadCSV('Restaurant.csv', result => {
             const restaurantGrid = document.getElementById('restaurant-grid');
+            const cuisineTitle = document.getElementById('cuisine-title');
             let filteredRestaurants = result.data;
 
             if (cuisine) {
                 filteredRestaurants = result.data.filter(r => r.Cuisine === cuisine);
+                cuisineTitle.textContent = `${cuisine} Restaurants`;
             }
 
             filteredRestaurants.forEach(restaurant => {
@@ -148,8 +112,6 @@ if (document.getElementById('restaurant-profile')) {
                 <p><strong>Neighborhood:</strong> ${restaurant['Neighborhood']}</p>
                 <p><a href="${restaurant['Google Maps Link']}" target="_blank"><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Google Maps"></a></p>
             `;
-        } else {
-            console.error(`Restaurant not found for ID: ${restaurantId}`);
         }
     });
 
@@ -183,7 +145,6 @@ if (document.getElementById('map')) {
 
     loadCSV('Restaurant.csv', result => {
         restaurants = result.data;
-        console.log('Restaurants loaded:', restaurants);
 
         // Populate filter dropdowns
         const cuisineFilter = document.getElementById('cuisine-filter');
@@ -236,31 +197,21 @@ if (document.getElementById('map')) {
                 return matchesCuisine && matchesCity && matchesNeighborhood && matchesChain && matchesKeyword;
             });
 
-            console.log('Search keyword:', searchKeyword);
-            console.log('Filtered restaurants:', filteredRestaurants);
-
             filteredRestaurants.forEach(restaurant => {
-                const lat = parseFloat(restaurant.Latitude);
-                const lon = parseFloat(restaurant.Longitude);
-
-                if (!isNaN(lat) && !isNaN(lon)) {
-                    const marker = L.marker([lat, lon]).addTo(map);
+                if (restaurant.Latitude && restaurant.Longitude) {
+                    const marker = L.marker([restaurant.Latitude, restaurant.Longitude]).addTo(map);
                     marker.bindPopup(`
                         <b>${restaurant['Restaurant ID']}</b><br>
                         ${restaurant.Cuisine}<br>
                         <a href="restaurant.html?id=${restaurant['Restaurant ID']}&cuisine=${restaurant.Cuisine}" target="_blank">View Details</a>
                     `);
                     markers.push(marker);
-                } else {
-                    console.warn(`Invalid coordinates for ${restaurant['Restaurant ID']}: Latitude=${restaurant.Latitude}, Longitude=${restaurant.Longitude}`);
                 }
             });
 
-            if (filteredRestaurants.length > 0 && markers.length > 0) {
+            if (filteredRestaurants.length > 0) {
                 const group = new L.featureGroup(markers);
                 map.fitBounds(group.getBounds());
-            } else {
-                console.warn('No valid markers to display');
             }
         }
 
