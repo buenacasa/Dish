@@ -128,7 +128,7 @@ header h1 {
     color: #4a3c31;
 }
 
-/* Restaurant grid (on cuisine page) */
+/* Restaurant grid (on cuisine page and restaurant page) */
 #restaurant-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -136,6 +136,13 @@ header h1 {
     padding: 20px;
     max-width: 1200px;
     margin: 0 auto;
+}
+
+/* Ensure tiles in restaurant grid don't stretch */
+#restaurant-grid .tile {
+    display: flex;
+    flex-direction: column;
+    height: auto;
 }
 
 #cuisine-title {
@@ -224,7 +231,7 @@ header h1 {
     margin: 5px 0;
 }
 
-.tile .keywords {
+.tile .-K {
     font-family: 'Montserrat', sans-serif;
     font-size: 14px;
     color: #5e4b3a;
@@ -302,6 +309,12 @@ header a:hover {
 .split-left, .split-right {
     flex: 1;
     overflow-y: auto;
+}
+
+/* Prevent split-right from stretching the grid */
+.split-right {
+    display: flex;
+    flex-direction: column;
 }
 
 /* Single-column layout for mobile */
@@ -384,7 +397,7 @@ header a:hover {
     background-color: #6b4a22;
 }
 
-/* Feedback link on home page */
+/* Footer and license styles */
 footer {
     text-align: center;
     padding: 20px;
