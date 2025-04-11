@@ -268,3 +268,65 @@ header a:hover {
 .leaflet-marker-icon.custom-marker {
     filter: hue-rotate(30deg) saturate(2); /* Adjusts blue to a warm tan (#d4a373) */
 }
+/* Feedback form styles */
+#feedback-form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#feedback-form p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    color: #5e4b3a;
+    margin-bottom: 20px;
+}
+
+#feedback-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#feedback-form label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a3c31;
+}
+
+#feedback-form input,
+#feedback-form textarea,
+#feedback-form select {
+    padding: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    border: 1px solid #d4a373;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#feedback-form textarea {
+    resize: vertical;
+}
+
+#feedback-form button {
+    padding: 12px;
+    background-color: #8b5a2b;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#feedback-form button:hover {
+    background-color: #6b4a22;
+}
