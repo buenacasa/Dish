@@ -24,6 +24,7 @@ header {
 }
 
 header .banner {
+    background-image: url('https://cdn.pixabay.com/photo/2017/02/15/10/39/salad-2068220_1280.jpg');
     background-size: cover;
     background-position: center;
     height: 200px;
@@ -75,6 +76,14 @@ header .map-link a:hover {
 /* Main content */
 main {
     padding: 20px;
+}
+
+/* Cuisine title */
+#cuisine-title {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 24px;
+    font-weight: 700;
 }
 
 /* Cuisine and Restaurant grids */
@@ -172,16 +181,18 @@ main {
 }
 
 .split-left, .split-right {
-    width: 50%;
     padding: 20px;
     box-sizing: border-box;
 }
 
+/* Desktop view */
 .split-left {
+    width: 40%;
     overflow-y: auto;
 }
 
 .split-right {
+    width: 60%;
     overflow-y: auto;
 }
 
@@ -189,9 +200,16 @@ main {
 #map-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: calc(100vh - 200px); /* Adjust for header, footer, and other content */
 }
 
+/* Ensure the map takes the remaining space */
+#map {
+    flex: 1;
+    min-height: 300px;
+}
+
+/* Map filters */
 #map-filters {
     display: flex;
     flex-wrap: wrap;
@@ -202,11 +220,6 @@ main {
 #map-filters select, #map-filters input {
     padding: 5px;
     font-size: 14px;
-}
-
-#map {
-    flex: 1;
-    min-height: 400px;
 }
 
 /* Apply Montserrat font to Leaflet map */
@@ -312,21 +325,6 @@ main {
 }
 
 #feedback-form button:hover {
-    background-color: #b5895a;
-}
-
-.back-link {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #d4a373;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: 600;
-    margin: 20px;
-}
-
-.back-link:hover {
     background-color: #b5895a;
 }
 
