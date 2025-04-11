@@ -1,4 +1,4 @@
-// Load CSV files
+// Load CSV files using PapaParse
 function loadCSV(file, callback) {
     const url = `data/${file}`;
     console.log(`Fetching: ${url}`);
@@ -26,240 +26,174 @@ function loadCSV(file, callback) {
         .catch(error => console.error(`Error loading ${file}:`, error));
 }
 
-// Load cuisine tiles on index.html and cuisine.html
-function loadCuisineTiles() {
-    loadCSV('Cuisine.csv', result => {
-        const cuisineGrid = document.getElementById('cuisine-grid');
+// Home Page - Load Cuisines
+if (document.getElementById('cuisine-grid')) {
+    console.log("Cuisine grid element found, loading cuisines...");
+    loadCSV('Cuisine.csv', function(result) {
+        const grid = document.getElementById('cuisine-grid');
+        if (!result.data || result.data.length === 0) {
+            console.error("No data found in Cuisine.csv or parsing failed.");
+            grid.innerHTML = "<p>Error: Could not load cuisines.</p>";
+            return;
+        }
         result.data.forEach(cuisine => {
+            console.log("Adding tile for:", cuisine['Cuisine ID']);
             const tile = document.createElement('div');
             tile.className = 'tile';
-            tile.innerHTML = `
-                <img src="${cuisine['Cuisine Image']}" alt="${cuisine['Cuisine ID']}">
-                <p>${cuisine['Cuisine ID']}</p>
-            `;
-            tile.addEventListener('click', () => {
-                window.location.href = `cuisine.html?cuisine=${cuisine['Cuisine ID']}`;
-            });
-            cuisineGrid.appendChild(tile);
+            tile.innerHTML = `<img src="${cuisine['Cuisine Image']}" alt="${cuisine['Cuisine ID']}"><p>${cuisine['Cuisine ID']}</p>`;
+            tile.onclick = () => window.location.href = `cuisine.html?cuisine=${encodeURIComponent(cuisine['Cuisine ID'])}`;
+            grid.appendChild(tile);
         });
     });
 }
 
-if (document.getElementById('cuisine-grid')) {
-    const isCuisinePage = window.location.pathname.includes('cuisine.html');
-    if (!isCuisinePage) {
-        // On index.html, load cuisine tiles
-        loadCuisineTiles();
-    } else {
-        // On cuisine.html, load cuisine tiles and filtered restaurants
-        loadCuisineTiles();
+// Cuisine Page - Load Restaurants
+if (document.getElementById('restaurant-grid')) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const cuisine = decodeURIComponent(urlParams.get('cuisine'));
+    document.getElementById('cuisine-title').textContent = `${cuisine} Restaurants`;
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const cuisine = urlParams.get('cuisine');
-
-        if (cuisine) {
-            loadCSV('Restaurant.csv', result => {
-                const restaurantGrid = document.getElementById('restaurant-grid');
-                const cuisineTitle = document.getElementById('cuisine-title');
-                const filteredRestaurants = result.data.filter(r => r.Cuisine === cuisine);
-
-                cuisineTitle.textContent = `${cuisine} Restaurants`;
-
-                filteredRestaurants.forEach(restaurant => {
-                    const tile = document.createElement('div');
-                    tile.className = 'tile';
-                    tile.innerHTML = `
-                        <img src="${restaurant['Restaurant Image']}" alt="${restaurant['Restaurant ID']}">
-                        <p class="name">${restaurant['Restaurant ID']}</p>
-                        <p class="keywords">${restaurant['Cuisine']}</p>
-                    `;
-                    tile.addEventListener('click', () => {
-                        window.location.href = `restaurant.html?id=${restaurant['Restaurant ID']}&cuisine=${cuisine}`;
-                    });
-                    restaurantGrid.appendChild(tile);
-                });
-            });
+    loadCSV('Restaurant.csv', function(result) {
+        const grid = document.getElementById('restaurant-grid');
+        if (!result.data || result.data.length === 0) {
+            console.error("No restaurant data found or parsing failed.");
+            grid.innerHTML = "<p>Error: Could not load restaurants.</p>";
+            return;
         }
-    }
+        const filtered = result.data.filter(r => {
+            const isOperational = r['Operational (Y/N)'] === 'Yes';
+            const hasCuisine = r['Cuisine Keywords'] && r['Cuisine Keywords'].includes(cuisine);
+            console.log(`Checking restaurant: ${r['Restaurant Name']}, Operational: ${isOperational}, Has Cuisine: ${hasCuisine}`);
+            return isOperational && hasCuisine;
+        });
+        console.log(`Filtered ${filtered.length} restaurants for cuisine: ${cuisine}`);
+        if (filtered.length === 0) {
+            grid.innerHTML = "<p>No restaurants found for this cuisine.</p>";
+        }
+        filtered.forEach(restaurant => {
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+            tile.innerHTML = `
+                <img src="${restaurant['Profile Picture']}" alt="${restaurant['Restaurant Name']}">
+                <p class="name">${restaurant['Restaurant Name']}</p>
+                <p class="keywords">${restaurant['Cuisine Keywords']}</p>
+            `;
+            tile.onclick = () => window.location.href = `restaurant.html?id=${restaurant['Restaurant ID']}&back=cuisine.html?cuisine=${encodeURIComponent(cuisine)}`;
+            grid.appendChild(tile);
+        });
+    });
 }
 
-// Load restaurant grid on restaurant.html
+// Restaurant Profile Page
 if (document.getElementById('restaurant-profile')) {
     const urlParams = new URLSearchParams(window.location.search);
-    const restaurantId = urlParams.get('id');
-    const cuisine = urlParams.get('cuisine');
+    const id = urlParams.get('id');
+    const back = urlParams.get('back');
+    document.getElementById('back-link').href = back;
 
-    document.getElementById('back-link').href = cuisine ? `cuisine.html?cuisine=${cuisine}` : 'index.html';
-
-    // Load restaurant grid for the selected cuisine
-    loadCSV('Restaurant.csv', result => {
-        const restaurantGrid = document.getElementById('restaurant-grid');
-        let filteredRestaurants = result.data;
-
-        if (cuisine) {
-            filteredRestaurants = result.data.filter(r => r.Cuisine === cuisine);
+    loadCSV('Restaurant.csv', function(result) {
+        const restaurant = result.data.find(r => r['Restaurant ID'] === id);
+        if (!restaurant) {
+            console.error(`Restaurant with ID ${id} not found.`);
+            document.getElementById('restaurant-profile').innerHTML = "<p>Restaurant not found.</p>";
+            return;
         }
+        const profile = document.getElementById('restaurant-profile');
+        const keywords = restaurant['Cuisine Keywords'].split(', ').map(k => `<a href="cuisine.html?cuisine=${encodeURIComponent(k)}">${k}</a>`).join(', ');
+        profile.innerHTML = `
+            <img src="${restaurant['Profile Picture']}" alt="${restaurant['Restaurant Name']}">
+            <h2>${restaurant['Restaurant Name']}</h2>
+            <p><strong>Cuisine:</strong> ${keywords}</p>
+            <p><strong>Chain:</strong> ${restaurant['Chain (Y/N)']}</p>
+            <p><strong>Address:</strong> ${restaurant['Address']}</p>
+            <p><strong>Neighborhood:</strong> ${restaurant['Neighborhood']}</p>
+            <p><a href="${restaurant['Google Maps Link']}" target="_blank"><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Google Maps"></a></p>
+        `;
 
-        filteredRestaurants.forEach(restaurant => {
-            const tile = document.createElement('div');
-            tile.className = 'tile';
-            tile.innerHTML = `
-                <img src="${restaurant['Restaurant Image']}" alt="${restaurant['Restaurant ID']}">
-                <p class="name">${restaurant['Restaurant ID']}</p>
-                <p class="keywords">${restaurant['Cuisine']}</p>
-            `;
-            tile.addEventListener('click', () => {
-                window.location.href = `restaurant.html?id=${restaurant['Restaurant ID']}&cuisine=${cuisine || ''}`;
+        loadCSV('Call.csv', function(callResult) {
+            const callsList = document.getElementById('calls-list');
+            const calls = callResult.data.filter(c => c['Restaurant ID'] === id);
+            calls.forEach(call => {
+                const div = document.createElement('div');
+                div.className = 'call';
+                div.innerHTML = `
+                    <p><strong>Date:</strong> ${call['Call Date']}</p>
+                    <p><strong>Sentiment:</strong> ${call['Sentiment']}</p>
+                    <p><strong>Recommended:</strong> ${call['Recommended Dishes/Quotes']}</p>
+                    <p><strong>Highlights:</strong> ${call['Call Highlights']}</p>
+                `;
+                callsList.appendChild(div);
             });
-            restaurantGrid.appendChild(tile);
-        });
-
-        // Highlight the selected restaurant
-        if (restaurantId) {
-            const selectedTile = Array.from(restaurantGrid.children).find(tile => 
-                tile.querySelector('.name').textContent === restaurantId
-            );
-            if (selectedTile) {
-                selectedTile.style.backgroundColor = '#d4a373';
-                selectedTile.style.color = '#fff';
-                selectedTile.querySelector('.keywords').style.color = '#fff';
-            }
-        }
-    });
-
-    // Load restaurant profile
-    loadCSV('Restaurant.csv', result => {
-        const restaurant = result.data.find(r => r['Restaurant ID'] === restaurantId);
-        if (restaurant) {
-            const profile = document.getElementById('restaurant-profile');
-            profile.innerHTML = `
-                <img src="${restaurant['Restaurant Image']}" alt="${restaurant['Restaurant ID']}">
-                <h2>${restaurant['Restaurant ID']}</h2>
-                <p><strong>Cuisine:</strong> ${restaurant['Cuisine']}</p>
-                <p><strong>Chain:</strong> ${restaurant['Chain']}</p>
-                <p><strong>Address:</strong> ${restaurant['Address']}</p>
-                <p><strong>Neighborhood:</strong> ${restaurant['Neighborhood']}</p>
-                <p><a href="${restaurant['Google Maps Link']}" target="_blank"><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Google Maps"></a></p>
-            `;
-        }
-    });
-
-    loadCSV('Call.csv', result => {
-        const callsList = document.getElementById('calls-list');
-        const calls = result.data.filter(call => call['Restaurant ID'] === restaurantId);
-        calls.forEach(call => {
-            const callDiv = document.createElement('div');
-            callDiv.className = 'call';
-            callDiv.innerHTML = `
-                <p><strong>Date:</strong> ${call['Date']}</p>
-                <p><strong>Sentiment:</strong> ${call['Sentiment']}</p>
-                <p><strong>Recommendation:</strong> ${call['Recommendation']}</p>
-                <p><strong>Highlights:</strong> ${call['Highlights']}</p>
-            `;
-            callsList.appendChild(callDiv);
         });
     });
 }
 
-// Map page logic
+// Map Page - Using Leaflet.js
 if (document.getElementById('map')) {
-    const map = L.map('map').setView([29.4241, -98.4936], 10); // Center on San Antonio
+    // Initialize Leaflet map
+    const map = L.map('map').setView([29.4241, -98.4936], 10); // San Antonio default
 
+    // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    let markers = [];
-    let restaurants = [];
-
-    loadCSV('Restaurant.csv', result => {
-        restaurants = result.data;
-        console.log('Restaurants loaded:', restaurants);
-
-        // Populate filter dropdowns
+    loadCSV('Restaurant.csv', function(result) {
+        if (!result.data || result.data.length === 0) {
+            console.error("No restaurant data found for map.");
+            return;
+        }
+        const restaurants = result.data.filter(r => r['Operational (Y/N)'] === 'Yes');
+        console.log(`Found ${restaurants.length} operational restaurants for map.`);
         const cuisineFilter = document.getElementById('cuisine-filter');
         const cityFilter = document.getElementById('city-filter');
         const neighborhoodFilter = document.getElementById('neighborhood-filter');
         const chainFilter = document.getElementById('chain-filter');
-        const restaurantFilter = document.getElementById('restaurant-filter');
 
-        const cuisines = [...new Set(restaurants.map(r => r.Cuisine))].sort();
-        const cities = [...new Set(restaurants.map(r => r.City))].sort();
-        const neighborhoods = [...new Set(restaurants.map(r => r.Neighborhood))].sort();
+        // Populate filters
+        const cuisines = [...new Set(restaurants.flatMap(r => r['Cuisine Keywords'].split(', ')))];
+        const cities = [...new Set(restaurants.map(r => r['City']))];
+        const neighborhoods = [...new Set(restaurants.map(r => r['Neighborhood']))];
+        cuisines.forEach(c => cuisineFilter.add(new Option(c, c)));
+        cities.forEach(c => cityFilter.add(new Option(c, c)));
+        neighborhoods.forEach(n => neighborhoodFilter.add(new Option(n, n)));
 
-        cuisines.forEach(cuisine => {
-            const option = document.createElement('option');
-            option.value = cuisine;
-            option.textContent = cuisine;
-            cuisineFilter.appendChild(option);
-        });
+        let markers = [];
 
-        cities.forEach(city => {
-            const option = document.createElement('option');
-            option.value = city;
-            option.textContent = city;
-            cityFilter.appendChild(option);
-        });
-
-        neighborhoods.forEach(neighborhood => {
-            const option = document.createElement('option');
-            option.value = neighborhood;
-            option.textContent = neighborhood;
-            neighborhoodFilter.appendChild(option);
-        });
-
-        function updateMarkers() {
-            markers.forEach(marker => map.removeLayer(marker));
+        function updateMap() {
+            // Clear existing markers
+            markers.forEach(marker => marker.remove());
             markers = [];
 
-            const selectedCuisine = cuisineFilter.value;
-            const selectedCity = cityFilter.value;
-            const selectedNeighborhood = neighborhoodFilter.value;
-            const selectedChain = chainFilter.value;
-            const searchKeyword = restaurantFilter.value.toLowerCase();
-
-            const filteredRestaurants = restaurants.filter(restaurant => {
-                const matchesCuisine = !selectedCuisine || restaurant.Cuisine === selectedCuisine;
-                const matchesCity = !selectedCity || restaurant.City === selectedCity;
-                const matchesNeighborhood = !selectedNeighborhood || restaurant.Neighborhood === selectedNeighborhood;
-                const matchesChain = !selectedChain || restaurant.Chain === selectedChain;
-                const matchesKeyword = !searchKeyword || restaurant['Restaurant ID'].toLowerCase().includes(searchKeyword);
-                return matchesCuisine && matchesCity && matchesNeighborhood && matchesChain && matchesKeyword;
+            const filtered = restaurants.filter(r => {
+                const matchesCuisine = !cuisineFilter.value || (r['Cuisine Keywords'] && r['Cuisine Keywords'].includes(cuisineFilter.value));
+                const matchesCity = !cityFilter.value || r['City'] === cityFilter.value;
+                const matchesNeighborhood = !neighborhoodFilter.value || r['Neighborhood'] === neighborhoodFilter.value;
+                const matchesChain = !chainFilter.value || r['Chain (Y/N)'] === chainFilter.value;
+                return matchesCuisine && matchesCity && matchesNeighborhood && matchesChain;
             });
 
-            console.log('Filtered restaurants:', filteredRestaurants);
-
-            filteredRestaurants.forEach(restaurant => {
-                const lat = parseFloat(restaurant.Latitude);
-                const lon = parseFloat(restaurant.Longitude);
-
-                if (!isNaN(lat) && !isNaN(lon)) {
-                    const marker = L.marker([lat, lon]).addTo(map);
-                    marker.bindPopup(`
-                        <b>${restaurant['Restaurant ID']}</b><br>
-                        ${restaurant.Cuisine}<br>
-                        <a href="restaurant.html?id=${restaurant['Restaurant ID']}&cuisine=${restaurant.Cuisine}" target="_blank">View Details</a>
-                    `);
-                    markers.push(marker);
-                } else {
-                    console.warn(`Invalid coordinates for ${restaurant['Restaurant ID']}: Latitude=${restaurant.Latitude}, Longitude=${restaurant.Longitude}`);
+            console.log(`Filtered ${filtered.length} restaurants for map.`);
+            filtered.forEach(r => {
+                if (!r['Coordinates']) {
+                    console.warn(`No coordinates for restaurant: ${r['Restaurant Name']}`);
+                    return;
                 }
+                const [lat, lng] = r['Coordinates'].split(',').map(Number);
+                if (isNaN(lat) || isNaN(lng)) {
+                    console.warn(`Invalid coordinates for ${r['Restaurant Name']}: ${r['Coordinates']}`);
+                    return;
+                }
+                const marker = L.marker([lat, lng]).addTo(map);
+                marker.bindPopup(`<b>${r['Restaurant Name']}</b><br><a href="restaurant.html?id=${r['Restaurant ID']}&back=map.html">View Details</a>`);
+                markers.push(marker);
             });
-
-            if (filteredRestaurants.length > 0 && markers.length > 0) {
-                const group = new L.featureGroup(markers);
-                map.fitBounds(group.getBounds());
-            } else {
-                console.warn('No valid markers to display');
-            }
         }
 
-        cuisineFilter.addEventListener('change', updateMarkers);
-        cityFilter.addEventListener('change', updateMarkers);
-        neighborhoodFilter.addEventListener('change', updateMarkers);
-        chainFilter.addEventListener('change', updateMarkers);
-        restaurantFilter.addEventListener('input', updateMarkers);
-
-        updateMarkers();
+        cuisineFilter.onchange = updateMap;
+        cityFilter.onchange = updateMap;
+        neighborhoodFilter.onchange = updateMap;
+        chainFilter.onchange = updateMap;
+        updateMap();
     });
 }
