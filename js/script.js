@@ -1,6 +1,5 @@
 // Load CSV files
 function loadCSV(file, callback) {
-    // Use the full raw GitHub URL to bypass potential GitHub Pages path issues
     const url = `https://raw.githubusercontent.com/buenacasa/Dish/main/data/${file}`;
     console.log(`Fetching: ${url}`);
     fetch(url)
@@ -29,7 +28,6 @@ function loadCSV(file, callback) {
         })
         .catch(error => {
             console.error(`Error loading ${file}:`, error);
-            // Fallback: Display an error message on the page
             const errorMessage = document.createElement('p');
             errorMessage.style.color = 'red';
             errorMessage.textContent = `Failed to load ${file}. Please check the console for details.`;
@@ -77,7 +75,7 @@ if (document.getElementById('restaurant-grid')) {
             let filteredRestaurants = result.data;
 
             if (cuisine) {
-                filteredRestaurants = result.data.filter(r => r.Cuisine === cuisine);
+                filteredRestaurants = result.data.filter(r => r['Cuisine Keywords'] === cuisine);
                 cuisineTitle.textContent = `${cuisine} Restaurants`;
             }
 
@@ -85,9 +83,9 @@ if (document.getElementById('restaurant-grid')) {
                 const tile = document.createElement('div');
                 tile.className = 'tile';
                 tile.innerHTML = `
-                    <img src="${restaurant['Restaurant Image']}" alt="${restaurant['Restaurant ID']}">
+                    <img src="${restaurant['Profile Picture']}" alt="${restaurant['Restaurant ID']}">
                     <p class="name">${restaurant['Restaurant ID']}</p>
-                    <p class="keywords">${restaurant['Cuisine']}</p>
+                    <p class="keywords">${restaurant['Cuisine Keywords']}</p>
                 `;
                 tile.addEventListener('click', () => {
                     window.location.href = `restaurant.html?id=${restaurant['Restaurant ID']}&cuisine=${cuisine || ''}`;
@@ -127,10 +125,10 @@ if (document.getElementById('restaurant-profile')) {
         if (restaurant) {
             const profile = document.getElementById('restaurant-profile');
             profile.innerHTML = `
-                <img src="${restaurant['Restaurant Image']}" alt="${restaurant['Restaurant ID']}">
+                <img src="${restaurant['Profile Picture']}" alt="${restaurant['Restaurant ID']}">
                 <h2>${restaurant['Restaurant ID']}</h2>
-                <p><strong>Cuisine:</strong> ${restaurant['Cuisine']}</p>
-                <p><strong>Chain:</strong> ${restaurant['Chain']}</p>
+                <p><strong>Cuisine:</strong> ${restaurant['Cuisine Keywords']}</p>
+                <p><strong>Chain:</strong> ${restaurant['Chain (Y/N)']}</p>
                 <p><strong>Address:</strong> ${restaurant['Address']}</p>
                 <p><strong>Neighborhood:</strong> ${restaurant['Neighborhood']}</p>
                 <p><a href="${restaurant['Google Maps Link']}" target="_blank"><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Google Maps"></a></p>
@@ -151,10 +149,10 @@ if (document.getElementById('restaurant-profile')) {
             const callDiv = document.createElement('div');
             callDiv.className = 'call';
             callDiv.innerHTML = `
-                <p><strong>Date:</strong> ${call['Date']}</p>
+                <p><strong>Date:</strong> ${call['Call Date']}</p>
                 <p><strong>Sentiment:</strong> ${call['Sentiment']}</p>
-                <p><strong>Recommendation:</strong> ${call['Recommendation']}</p>
-                <p><strong>Highlights:</strong> ${call['Highlights']}</p>
+                <p><strong>Recommended:</strong> ${call['Recommended Dishes/Quotes']}</p>
+                <p><strong>Highlights:</strong> ${call['Call Highlights']}</p>
             `;
             callsList.appendChild(callDiv);
         });
@@ -177,7 +175,21 @@ if (document.getElementById('map')) {
             console.error('No restaurant data loaded for map');
             return;
         }
-        restaurants = result.data;
+        restaurants = result.data.map(restaurant => {
+            // Parse the Coordinates field (e.g., "29.5721493,-98.4874170")
+            let latitude = null;
+            let longitude = null;
+            if (restaurant['Coordinates']) {
+                const coords = restaurant['Coordinates'].replace(/"/g, '').split(',');
+                latitude = parseFloat(coords[0]);
+                longitude = parseFloat(coords[1]);
+            }
+            return {
+                ...restaurant,
+                Latitude: latitude,
+                Longitude: longitude
+            };
+        });
 
         // Populate filter dropdowns
         const cuisineFilter = document.getElementById('cuisine-filter');
@@ -186,9 +198,9 @@ if (document.getElementById('map')) {
         const chainFilter = document.getElementById('chain-filter');
         const restaurantFilter = document.getElementById('restaurant-filter');
 
-        const cuisines = [...new Set(restaurants.map(r => r.Cuisine))].sort();
-        const cities = [...new Set(restaurants.map(r => r.City))].sort();
-        const neighborhoods = [...new Set(restaurants.map(r => r.Neighborhood))].sort();
+        const cuisines = [...new Set(restaurants.map(r => r['Cuisine Keywords']))].sort();
+        const cities = [...new Set(restaurants.map(r => r['City']))].sort();
+        const neighborhoods = [...new Set(restaurants.map(r => r['Neighborhood']))].sort();
 
         cuisines.forEach(cuisine => {
             const option = document.createElement('option');
@@ -222,10 +234,10 @@ if (document.getElementById('map')) {
             const searchKeyword = restaurantFilter.value.toLowerCase();
 
             const filteredRestaurants = restaurants.filter(restaurant => {
-                const matchesCuisine = !selectedCuisine || restaurant.Cuisine === selectedCuisine;
-                const matchesCity = !selectedCity || restaurant.City === selectedCity;
-                const matchesNeighborhood = !selectedNeighborhood || restaurant.Neighborhood === selectedNeighborhood;
-                const matchesChain = !selectedChain || restaurant.Chain === selectedChain;
+                const matchesCuisine = !selectedCuisine || restaurant['Cuisine Keywords'] === selectedCuisine;
+                const matchesCity = !selectedCity || restaurant['City'] === selectedCity;
+                const matchesNeighborhood = !selectedNeighborhood || restaurant['Neighborhood'] === selectedNeighborhood;
+                const matchesChain = !selectedChain || restaurant['Chain (Y/N)'] === selectedChain;
                 const matchesKeyword = !searchKeyword || restaurant['Restaurant ID'].toLowerCase().includes(searchKeyword);
                 return matchesCuisine && matchesCity && matchesNeighborhood && matchesChain && matchesKeyword;
             });
@@ -235,8 +247,8 @@ if (document.getElementById('map')) {
                     const marker = L.marker([restaurant.Latitude, restaurant.Longitude]).addTo(map);
                     marker.bindPopup(`
                         <b>${restaurant['Restaurant ID']}</b><br>
-                        ${restaurant.Cuisine}<br>
-                        <a href="restaurant.html?id=${restaurant['Restaurant ID']}&cuisine=${restaurant.Cuisine}" target="_blank">View Details</a>
+                        ${restaurant['Cuisine Keywords']}<br>
+                        <a href="restaurant.html?id=${restaurant['Restaurant ID']}&cuisine=${restaurant['Cuisine Keywords']}" target="_blank">View Details</a>
                     `);
                     markers.push(marker);
                 }
