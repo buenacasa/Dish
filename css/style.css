@@ -1,114 +1,68 @@
-body {
-    font-family: Arial, sans-serif;
+/* Reset default styles for consistency */
+* {
     margin: 0;
     padding: 0;
-    background-color: #f5f5f5;
+    box-sizing: border-box;
 }
 
+/* Body and global styles */
+body {
+    font-family: 'Playfair Display', serif; /* Elegant, food-inspired font */
+    background-color: #f5ede3; /* Light beige background, like parchment */
+    color: #4a3c31; /* Dark brown text for warmth */
+}
+
+/* Header styles */
 header {
     text-align: center;
     padding: 20px;
+    background-color: #8b5a2b; /* Rich brown, like wood */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.banner {
+header .banner {
+    height: 300px;
     background-size: cover;
     background-position: center;
-    height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    position: relative;
+    border-radius: 10px;
+    margin: 0 auto;
+    max-width: 1200px;
 }
 
+header h1 {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 48px;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.3); /* Slight background for readability */
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+/* Description paragraph */
 .description {
-    padding: 20px;
-    text-align: center;
-    background-color: #fff;
-    margin: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-family: 'Lora', serif; /* Warm, readable serif font */
+    font-size: 18px;
+    line-height: 1.6;
+    margin: 20px 0;
+    color: #5e4b3a; /* Slightly lighter brown for contrast */
 }
 
-#cuisine-grid, #restaurant-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
-    padding: 20px;
-}
-
-.tile {
-    background-color: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    cursor: pointer;
-}
-
-.tile img {
-    width: 100%;
-    height: 120px;
-    object-fit: cover;
-}
-
-.tile p {
-    margin: 10px;
-}
-
-.tile .name { font-size: 1.2em; }
-.tile .keywords { font-size: 0.9em; color: #666; }
-
-#restaurant-profile {
-    padding: 20px;
-    background-color: white;
-    margin: 20px;
-    border-radius: 8px;
-}
-
-#restaurant-profile img {
-    width: 100%;
-    max-width: 300px;
-    border-radius: 8px;
-}
-
-#restaurant-profile img[src*="red-dot.png"] {
-    width: 24px;
-    height: 24px;
-}
-
-#calls-list {
-    padding: 20px;
-}
-
-.call {
-    background-color: white;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-#map {
-    height: 500px;
-    width: 100%;
-}
-
-#filters {
-    padding: 20px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-@media (max-width: 600px) {
-    #cuisine-grid, #restaurant-grid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+/* Center and limit width on desktop */
+@media (min-width: 768px) {
+    .description {
+        max-width: 700px;
+        margin: 20px auto;
+        text-align: center;
     }
 }
-/* Existing styles (if any) */
 
-/* Style for the map link on the home page */
+/* Map link on home page */
 .map-link {
     text-align: center;
     margin: 20px 0;
@@ -116,10 +70,11 @@ header {
 
 .map-link a {
     display: inline-block;
-    padding: 10px 20px;
-    background-color: #4CAF50; /* Green background */
-    color: white;
+    padding: 12px 24px;
+    background-color: #d4a373; /* Warm tan color */
+    color: #fff;
     text-decoration: none;
+    font-family: 'Lora', serif;
     font-size: 18px;
     font-weight: bold;
     border-radius: 5px;
@@ -127,11 +82,167 @@ header {
 }
 
 .map-link a:hover {
-    background-color: #45a049; /* Slightly darker green on hover */
+    background-color: #c68e55; /* Slightly darker tan on hover */
 }
 
-/* Style for the map icon (from previous fix) */
+/* Cuisine grid (tiles on home page) */
+#cuisine-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.tile {
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.tile:hover {
+    transform: scale(1.05);
+}
+
+.tile img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.tile p {
+    text-align: center;
+    padding: 10px;
+    font-family: 'Lora', serif;
+    font-size: 16px;
+    color: #4a3c31;
+}
+
+/* Restaurant grid (on cuisine page) */
+#restaurant-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#cuisine-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    color: #8b5a2b;
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* Restaurant profile page */
+#restaurant-profile {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#restaurant-profile img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+#restaurant-profile h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: #8b5a2b;
+    margin: 15px 0;
+}
+
+#restaurant-profile p {
+    font-family: 'Lora', serif;
+    font-size: 16px;
+    color: #5e4b3a;
+    margin: 10px 0;
+}
+
+#restaurant-profile a {
+    color: #d4a373;
+    text-decoration: none;
+}
+
+#restaurant-profile a:hover {
+    text-decoration: underline;
+}
+
 #restaurant-profile img[src*="red-dot.png"] {
     width: 24px;
     height: 24px;
+}
+
+/* Calls list on restaurant profile page */
+#calls-list {
+    margin-top: 20px;
+}
+
+.call {
+    background-color: #f9f5f0;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.call p {
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    color: #5e4b3a;
+}
+
+/* Map page filters */
+#filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background-color: #8b5a2b;
+}
+
+#filters select {
+    padding: 8px;
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    background-color: #d4a373;
+    color: #fff;
+}
+
+#map {
+    height: 500px;
+    max-width: 1200px;
+    margin: 0 auto;
+    border-radius: 10px;
+}
+
+/* Back links */
+header a {
+    display: inline-block;
+    margin: 10px;
+    padding: 8px 16px;
+    background-color: #d4a373;
+    color: #fff;
+    text-decoration: none;
+    font-family: 'Lora', serif;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+header a:hover {
+    background-color: #c68e55;
 }
