@@ -6,13 +6,28 @@
     <title>The Dish - Restaurant</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 </head>
 <body>
     <header>
         <a id="back-link">Back</a>
     </header>
     <main class="split-screen">
-        <section id="restaurant-grid" class="split-left"></section>
+        <section class="split-left">
+            <section id="restaurant-grid" class="mobile-only"></section>
+            <div id="map-container" class="desktop-only">
+                <div id="map-filters">
+                    <select id="cuisine-filter"><option value="">All Cuisines</option></select>
+                    <select id="city-filter"><option value="">All Cities</option></select>
+                    <select id="neighborhood-filter"><option value="">All Neighborhoods</option></select>
+                    <select id="chain-filter"><option value="">All Chains</option></select>
+                    <input type="text" id="restaurant-filter" placeholder="Search by Restaurant Name">
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
         <section class="split-right">
             <div id="restaurant-profile"></div>
             <div id="calls-list"></div>
@@ -21,7 +36,6 @@
     <footer>
         <p class="license">© 2025 The Dish. Licensed under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.</p>
     </footer>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="js/script.js"></script>
 </body>
 </html>
