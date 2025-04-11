@@ -1,191 +1,147 @@
-/* Reset default styles for consistency */
+/* Reset default styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Body and global styles */
+/* Base styles */
 body {
     font-family: 'Montserrat', sans-serif;
-    background-color: #f5ede3;
-    color: #4a3c31;
+    background-color: #f5f1e9;
+    color: #4a3728;
+    line-height: 1.6;
 }
 
 /* Header styles */
 header {
-    text-align: center;
+    background-color: #fff;
     padding: 20px;
+    text-align: center;
 }
 
-/* Banner (used on home page) */
 header .banner {
-    height: 300px;
     background-size: cover;
     background-position: center;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
-    border-radius: 10px;
-    margin: 0 auto;
-    max-width: 1200px;
 }
 
-/* Header title on home page (inside banner) */
-header .banner h1 {
+header .banner::before {
+    content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+header .banner h1 {
     color: #fff;
     font-size: 48px;
     font-weight: 700;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    position: relative;
+    z-index: 1;
 }
 
-/* Header title on other pages (not inside banner) */
-header h1 {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 32px;
-    font-weight: 700;
-    color: #8b5a2b;
-    margin: 20px 0;
+header .description {
+    max-width: 800px;
+    margin: 20px auto;
+    font-size: 16px;
+    color: #4a3728;
 }
 
-/* Description paragraph */
-.description {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 18px;
-    line-height: 1.6;
-    margin: 20px 0;
-    color: #5e4b3a;
-}
-
-/* Center and limit width on desktop */
-@media (min-width: 768px) {
-    .description {
-        max-width: 700px;
-        margin: 20px auto;
-        text-align: center;
-    }
-}
-
-/* Map link on home page */
-.map-link {
-    text-align: center;
-    margin: 20px 0;
-}
-
-.map-link a {
+header .map-link a {
     display: inline-block;
-    padding: 12px 24px;
-    background-color: #8b5a2b;
+    padding: 10px 20px;
+    background-color: #d4a373;
     color: #fff;
     text-decoration: none;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 18px;
-    font-weight: 600;
     border-radius: 5px;
-    transition: background-color 0.3s;
+    font-weight: 600;
 }
 
-.map-link a:hover {
-    background-color: #6b4a22;
+header .map-link a:hover {
+    background-color: #b5895a;
 }
 
-/* Cuisine grid (tiles on home page) */
-#cuisine-grid {
+/* Main content */
+main {
+    padding: 20px;
+}
+
+/* Cuisine and Restaurant grids */
+#cuisine-grid, #restaurant-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
     padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
 }
 
-.tile {
+#cuisine-grid .tile, #restaurant-grid .tile {
     background-color: #fff;
-    border-radius: 10px;
-    overflow: hidden;
+    border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
-    cursor: pointer;
-}
-
-.tile:hover {
-    transform: scale(1.05);
-}
-
-.tile img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-}
-
-.tile p {
     text-align: center;
     padding: 10px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    color: #4a3c31;
-}
-
-/* Restaurant grid (on cuisine page and restaurant page) */
-#restaurant-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-/* Ensure tiles in restaurant grid don't stretch */
-#restaurant-grid .tile {
+    width: 200px; /* Fixed width */
+    aspect-ratio: 1 / 1; /* Square aspect ratio */
     display: flex;
     flex-direction: column;
-    height: auto;
+    align-items: center;
 }
 
-#cuisine-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 32px;
-    font-weight: 700;
-    color: #8b5a2b;
-    text-align: center;
-    margin: 20px 0;
+#cuisine-grid .tile img, #restaurant-grid .tile img {
+    width: 100%;
+    height: 150px; /* Fixed height for the image */
+    object-fit: cover; /* Prevent stretching */
+    border-radius: 5px;
 }
 
-/* Restaurant profile page */
+#cuisine-grid .tile p, #restaurant-grid .tile p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+#restaurant-grid .tile .name {
+    font-weight: 600;
+}
+
+#restaurant-grid .tile .keywords {
+    color: #777;
+}
+
+/* Restaurant profile */
 #restaurant-profile {
-    max-width: 800px;
     max-height: 80vh;
     overflow-y: auto;
-    margin: 20px auto;
-    padding: 20px;
     background-color: #fff;
-    border-radius: 10px;
+    padding: 20px;
+    border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
 }
 
 #restaurant-profile img {
     width: 100%;
     max-height: 300px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 5px;
 }
 
 #restaurant-profile h2 {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 28px;
+    margin: 10px 0;
+    font-size: 24px;
     font-weight: 700;
-    color: #8b5a2b;
-    margin: 15px 0;
 }
 
 #restaurant-profile p {
-    font-family: 'Montserrat', sans-serif;
+    margin: 5px 0;
     font-size: 16px;
-    color: #5e4b3a;
-    margin: 10px 0;
 }
 
 #restaurant-profile a {
@@ -197,243 +153,139 @@ header h1 {
     text-decoration: underline;
 }
 
-#restaurant-profile img[src*="red-dot.png"] {
-    width: 24px;
-    height: 24px;
-}
-
-/* Calls list on restaurant profile page */
-#calls-list {
-    margin-top: 20px;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.call {
-    background-color: #f9f5f0;
+/* Calls list */
+#calls-list .call {
+    background-color: #fff;
     padding: 15px;
     border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     margin-bottom: 10px;
 }
 
-.call p {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    color: #5e4b3a;
-    line-height: 1.5;
-}
-
-/* Restaurant tiles (make restaurant name more prominent) */
-.tile .name {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 18px;
-    font-weight: 600;
-    color: #4a3c31;
+#calls-list .call p {
     margin: 5px 0;
-}
-
-.tile .-K {
-    font-family: 'Montserrat', sans-serif;
     font-size: 14px;
-    color: #5e4b3a;
-    margin: 0;
 }
 
-/* Map page filters */
-#filters {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    padding: 20px;
-}
-
-#filters select,
-#filters input {
-    padding: 8px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    border: none;
-    border-radius: 5px;
-    background-color: #d4a373;
-    color: #fff;
-}
-
-#filters input::placeholder {
-    color: #f5ede3;
-}
-
-#map {
-    height: 500px;
-    max-width: 1200px;
-    margin: 0 auto;
-    border-radius: 10px;
-}
-
-/* Custom Leaflet map pins */
-.leaflet-marker-icon {
-    background-image: url('https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png');
-    background-size: cover;
-    width: 25px !important;
-    height: 41px !important;
-    margin-left: -12px !important;
-    margin-top: -41px !important;
-}
-
-/* Back links */
-header a {
-    display: inline-block;
-    margin: 10px;
-    padding: 8px 16px;
-    background-color: #8b5a2b;
-    color: #fff;
-    text-decoration: none;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    border-radius: 5px;
-}
-
-header a:hover {
-    background-color: #6b4a22;
-}
-
-/* Split-screen layout for desktop */
+/* Split screen layout */
 .split-screen {
     display: flex;
-    flex-direction: row;
-    gap: 20px;
-    padding: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
+    min-height: calc(100vh - 120px); /* Adjust for header and footer */
 }
 
 .split-left, .split-right {
-    flex: 1;
+    width: 50%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.split-left {
     overflow-y: auto;
 }
 
-/* Prevent split-right from stretching the grid */
 .split-right {
-    display: flex;
-    flex-direction: column;
+    overflow-y: auto;
 }
 
-/* Single-column layout for mobile */
+/* Map container */
+#map-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#map-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#map-filters select, #map-filters input {
+    padding: 5px;
+    font-size: 14px;
+}
+
+#map {
+    flex: 1;
+    min-height: 400px;
+}
+
+/* Responsive layout */
+.mobile-only {
+    display: none;
+}
+
+.desktop-only {
+    display: block;
+}
+
 @media (max-width: 768px) {
     .split-screen {
         flex-direction: column;
     }
 
     .split-left, .split-right {
-        flex: none;
         width: 100%;
     }
 
-    /* Hide restaurant grid on restaurant.html in mobile view */
-    #restaurant-grid {
+    .mobile-only {
+        display: block;
+    }
+
+    .desktop-only {
         display: none;
     }
 }
 
-/* Feedback form styles */
-#feedback-form {
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-#feedback-form p {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    color: #5e4b3a;
-    margin-bottom: 20px;
-}
-
-#feedback-form form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-#feedback-form label {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: #4a3c31;
-}
-
-#feedback-form input,
-#feedback-form textarea,
-#feedback-form select {
-    padding: 10px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    border: 1px solid #d4a373;
-    border-radius: 5px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-#feedback-form textarea {
-    resize: vertical;
-}
-
-#feedback-form button {
-    padding: 12px;
-    background-color: #8b5a2b;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-#feedback-form button:hover {
-    background-color: #6b4a22;
-}
-
-/* Footer and license styles */
-footer {
-    text-align: center;
-    padding: 20px;
+/* Back link */
+#back-link {
+    display: inline-block;
+    padding: 10px 20px;
     background-color: #d4a373;
-    color: #4a3c31;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
 }
 
-footer .license {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
+#back-link:hover {
+    background-color: #b5895a;
+}
+
+/* Feedback link (Share Your Restaurant Experience) */
+.feedback-link {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.feedback-link a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #d4a373;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
+}
+
+.feedback-link a:hover {
+    background-color: #b5895a;
+}
+
+/* Footer */
+footer {
+    background-color: #4a3728;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
 }
 
 footer .license a {
-    color: #8b5a2b;
+    color: #d4a373;
     text-decoration: none;
 }
 
 footer .license a:hover {
     text-decoration: underline;
-}
-
-.feedback-link a {
-    display: inline-block;
-    padding: 12px 24px;
-    background-color: #8b5a2b;
-    color: #fff;
-    text-decoration: none;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-
-.feedback-link a:hover {
-    background-color: #6b4a22;
 }
