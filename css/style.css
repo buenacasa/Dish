@@ -292,6 +292,13 @@ main {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+.feedback-title {
+    text-align: center;
+    margin: 20px 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
 .form-group {
     margin-bottom: 15px;
 }
