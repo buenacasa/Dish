@@ -215,7 +215,7 @@ main {
 /* Ensure the map takes the remaining space */
 #map {
     flex: 1;
-    min-height: 250px; /* Reduced min-height */
+    min-height: 300px; /* Reduced min-height */
 }
 
 /* Feedback link (Share Your Restaurant Experience) */
