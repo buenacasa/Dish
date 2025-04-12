@@ -209,7 +209,7 @@ main {
     display: flex;
     flex-direction: column;
     height: calc(100vh - 300px); /* Further reduced height */
-    margin-bottom: 10px; /* Reduce white space below map */
+    margin-bottom: 5px; /* Reduce white space below map */
 }
 
 /* Ensure the map takes the remaining space */
