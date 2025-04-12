@@ -192,26 +192,36 @@ main {
 
 /* Desktop view */
 .split-left {
-    width: 37%; /* Adjusted split ratio */
+    width: 37%;
     overflow-y: auto;
 }
 
 .split-right {
-    width: 63%; /* Adjusted split ratio */
+    width: 63%;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    height: auto; /* Allow the container to fit content */
 }
 
 /* Map container */
 #map-container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 300px); /* Reduced height to show Share button */
+    height: calc(100vh - 350px); /* Further reduced height */
+    margin-bottom: 10px; /* Reduce white space below map */
 }
 
 /* Ensure the map takes the remaining space */
 #map {
     flex: 1;
-    min-height: 300px;
+    min-height: 250px; /* Reduced min-height */
+}
+
+/* Feedback link (Share Your Restaurant Experience) */
+.feedback-link {
+    text-align: center;
+    margin: 10px 0; /* Reduced margin to minimize white space */
 }
 
 /* Map filters */
