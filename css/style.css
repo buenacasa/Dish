@@ -16,11 +16,8 @@ body {
 /* Header styles */
 header {
     background-color: #fff;
-    padding: 20px;
     text-align: center;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
+    display: block; /* Remove flex to avoid centering issues */
 }
 
 header .banner {
@@ -32,6 +29,8 @@ header .banner {
     align-items: center;
     justify-content: center;
     position: relative;
+    width: 100vw; /* Full viewport width */
+    margin-left: calc(-50vw + 50%); /* Center the banner by offsetting the body’s centering */
 }
 
 header .banner::before {
@@ -46,10 +45,11 @@ header .banner::before {
 
 header .banner h1 {
     color: #fff;
-    font-size: 56px; /* Increased font size */
+    font-size: 56px;
     font-weight: 700;
     position: relative;
     z-index: 1;
+    text-align: center;
 }
 
 .description-container {
@@ -59,7 +59,7 @@ header .banner h1 {
 
 header .description {
     max-width: 800px;
-    margin: 0 auto 20px auto; /* Adjusted margin */
+    margin: 0 auto 20px auto;
     font-size: 16px;
     color: #4a3728;
 }
