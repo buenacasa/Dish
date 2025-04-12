@@ -208,7 +208,7 @@ main {
 #map-container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 350px); /* Further reduced height */
+    height: calc(100vh - 300px); /* Further reduced height */
     margin-bottom: 10px; /* Reduce white space below map */
 }
 
